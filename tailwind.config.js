@@ -26,9 +26,10 @@ export default {
           accent: '#00ff88',
           purple: '#8b5cf6',
         }
-      },
-      fontFamily: {
-        'mono': ['JetBrains Mono', 'Monaco', 'Consolas', 'monospace'],
+      },      fontFamily: {
+        'mono': ['Share Tech Mono', 'IBM Plex Mono', 'JetBrains Mono', 'Monaco', 'Consolas', 'monospace'],
+        'display': ['IBM Plex Mono', 'monospace'],
+        'code': ['Share Tech Mono', 'monospace'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

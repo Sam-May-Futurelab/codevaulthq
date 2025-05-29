@@ -5,6 +5,8 @@ import UploadPage from './pages/UploadPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import BrowsePage from './pages/BrowsePage.tsx';
 import Header from './components/Header.tsx';
+import AudioToggle from './components/AudioToggle.tsx';
+import ThemeToggle from './components/ThemeToggle.tsx';
 import './App.css';
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
             <Route path="/browse" element={<BrowsePage />} />
           </Routes>
         </main>
+        <AudioToggle />
+        <ThemeToggle />
       </div>
     </Router>
   );
