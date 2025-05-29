@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Search, Grid, List } from 'lucide-react';
-import SnippetCard from '../components/SnippetCard';
+import SnippetCard from '../components/SnippetCard.tsx';
 
 const BrowsePage = () => {
   const [searchQuery, setSearchQuery] = useState('');

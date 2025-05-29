@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { Code, Users, Download, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import ThreeHero from '../components/ThreeHero';
-import SnippetCard from '../components/SnippetCard';
-import TagCloud from '../components/TagCloud';
+import ThreeHero from '../components/ThreeHero.tsx';
+import SnippetCard from '../components/SnippetCard.tsx';
+import TagCloud from '../components/TagCloud.tsx';
 
 const HomePage = () => {
   // Mock data for now
