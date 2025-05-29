@@ -5,9 +5,7 @@ const ThreeHero = () => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const animationRef = useRef<number | null>(null);
-
-  useEffect(() => {
+  const animationRef = useRef<number | null>(null);  useEffect(() => {
     if (!mountRef.current) return;
 
     // Scene setup
@@ -77,38 +75,46 @@ const ThreeHero = () => {
     const gridHelper = new THREE.GridHelper(20, 20, 0x00ff88, 0x00ff88);
     gridHelper.material.opacity = 0.1;
     gridHelper.material.transparent = true;
-    gridHelper.rotateX(Math.PI / 2);
-    gridHelper.position.z = -2;
+    gridHelper.rotateX(Math.PI / 2);    gridHelper.position.z = -2;
     scene.add(gridHelper);
 
-    // Animation loop
+    // Mouse interaction variables
+    let mouseX = 0;
+    let mouseY = 0;    // Animation loop
     const animate = () => {
+      if (!renderer || !scene || !camera || !orb || !glow || !particlesMesh) return;
+      
       animationRef.current = requestAnimationFrame(animate);
 
-      // Rotate orb
+      // Gentle orb rotation
       orb.rotation.x += 0.005;
       orb.rotation.y += 0.005;
       glow.rotation.x += 0.003;
       glow.rotation.y += 0.003;
 
-      // Float orb
-      orb.position.y = Math.sin(Date.now() * 0.001) * 0.3;
-      glow.position.y = Math.sin(Date.now() * 0.001) * 0.3;
+      // Smooth mouse-responsive movement (stay centered but follow cursor gently)
+      const targetX = mouseX * 0.1;
+      const targetY = mouseY * 0.1;
+      
+      // Lerp to smooth movement
+      orb.position.x += (targetX - orb.position.x) * 0.02;
+      orb.position.y += (targetY - orb.position.y) * 0.02;
+      glow.position.x = orb.position.x;
+      glow.position.y = orb.position.y;
 
-      // Animate particles
-      particlesMesh.rotation.y += 0.001;
-      particlesMesh.rotation.x += 0.0005;
+      // Gentle particle rotation
+      particlesMesh.rotation.y += 0.002;
+      particlesMesh.rotation.x += 0.001;
 
-      // Pulse glow
-      const pulseScale = 1 + Math.sin(Date.now() * 0.003) * 0.1;
+      // Subtle glow pulse
+      const pulseScale = 1 + Math.sin(Date.now() * 0.002) * 0.05;
       glow.scale.setScalar(pulseScale);
 
       renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Handle resize
+    };    // Start animation loop after a brief delay to ensure everything is ready
+    setTimeout(() => {
+      animate();
+    }, 100);// Handle resize
     const handleResize = () => {
       if (!camera || !renderer) return;
       
@@ -117,18 +123,10 @@ const ThreeHero = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
-    window.addEventListener('resize', handleResize);
-
-    // Mouse interaction
+    window.addEventListener('resize', handleResize);    // Mouse interaction - update mouse variables
     const handleMouseMove = (event: MouseEvent) => {
-      const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-      
-      orb.rotation.y = mouseX * 0.5;
-      orb.rotation.x = mouseY * 0.3;
-      
-      particlesMesh.rotation.y = mouseX * 0.1;
-      particlesMesh.rotation.x = mouseY * 0.1;
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -156,11 +154,10 @@ const ThreeHero = () => {
       renderer.dispose();
     };
   }, []);
-
   return (
     <div
       ref={mountRef}
-      className="absolute inset-0 pointer-events-none"
+      className="absolute inset-0 w-full h-full pointer-events-none"
       style={{ zIndex: 1 }}
     />
   );
