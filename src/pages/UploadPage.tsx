@@ -23,10 +23,8 @@ const UploadPage = () => {
     cssCode: '/* Your CSS code here */\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  font-family: Arial, sans-serif;\n}\n\nh1 {\n  color: #00ff88;\n  animation: glow 2s ease-in-out infinite alternate;\n}\n\n@keyframes glow {\n  from { text-shadow: 0 0 20px #00ff88; }\n  to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }\n}',
     jsCode: '// Your JavaScript code here\nconsole.log("Hello from Code Vault HQ!");\n\n// Add some interactivity\ndocument.addEventListener("DOMContentLoaded", function() {\n  const container = document.querySelector(".container");\n  \n  container.addEventListener("click", function() {\n    this.style.transform = this.style.transform === "scale(1.1)" ? "scale(1)" : "scale(1.1)";\n  });\n});'
   });
-
   const [activeTab, setActiveTab] = useState<'html' | 'css' | 'js'>('css');
   const [tagInput, setTagInput] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
   const previewRef = useRef<HTMLIFrameElement>(null);
 
   const categories = [

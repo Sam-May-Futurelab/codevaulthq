@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Code, Play, Download, Copy, Heart, Eye, MessageCircle, Share } from 'lucide-react';
+import { Play, Download, Copy, Heart, Eye, MessageCircle, Share } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 const SnippetDetail = () => {

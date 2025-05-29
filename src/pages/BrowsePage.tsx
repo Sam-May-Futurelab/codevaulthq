@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Search, Filter, SortAsc, Grid, List } from 'lucide-react';
+import { Search, Grid, List } from 'lucide-react';
 import SnippetCard from '../components/SnippetCard';
 
 const BrowsePage = () => {
