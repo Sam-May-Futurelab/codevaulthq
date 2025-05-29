@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Code, Users, Download, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ThreeHero from '../components/ThreeHero';
 import SnippetCard from '../components/SnippetCard';
 import TagCloud from '../components/TagCloud';
@@ -75,20 +76,24 @@ const HomePage = () => {
           >
             Discover, share, and showcase beautiful interactive code snippets.
             The ultimate vault for creative developers.
-          </motion.p>
-
-          <motion.div
+          </motion.p>          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-6 justify-center"
           >
-            <button className="bg-vault-accent hover:bg-vault-accent/80 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105 glow-green">
+            <Link
+              to="/browse"
+              className="retro-button text-black px-10 py-4 rounded-xl font-bold text-lg uppercase tracking-wider transform transition-all duration-300 hover:scale-105 glow-green text-center"
+            >
               Explore Snippets
-            </button>
-            <button className="border-2 border-vault-purple text-vault-purple hover:bg-vault-purple hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
+            </Link>
+            <Link
+              to="/upload"
+              className="retro-button-outline px-10 py-4 rounded-xl font-bold text-lg uppercase tracking-wider transform transition-all duration-300 hover:scale-105 glow-purple text-center"
+            >
               Upload Your Code
-            </button>
+            </Link>
           </motion.div>
         </div>
 
@@ -107,10 +112,8 @@ const HomePage = () => {
             />
           </div>
         </motion.div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 bg-vault-medium/50">
+      </section>      {/* Stats Section */}
+      <section className="py-20 bg-gradient-to-br from-vault-dark via-vault-medium to-vault-dark border-y border-vault-accent/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -119,12 +122,12 @@ const HomePage = () => {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center"
+                className="text-center group"
               >
-                <div className="bg-vault-dark/50 rounded-xl p-6 border border-vault-light/20">
-                  <stat.icon className="w-8 h-8 text-vault-accent mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                  <div className="text-gray-400">{stat.label}</div>
+                <div className="bg-gradient-to-br from-vault-dark/80 to-vault-medium/80 rounded-xl p-8 border border-vault-accent/30 hover:border-vault-accent/60 transition-all duration-300 group-hover:scale-105 backdrop-blur-sm">
+                  <stat.icon className="w-10 h-10 text-vault-accent mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="text-4xl font-bold text-white mb-2 font-mono">{stat.value}</div>
+                  <div className="text-gray-300 uppercase tracking-wider text-sm font-semibold">{stat.label}</div>
                 </div>
               </motion.div>
             ))}
@@ -160,17 +163,18 @@ const HomePage = () => {
                 <SnippetCard snippet={snippet} />
               </motion.div>
             ))}
-          </div>
-
-          <motion.div
+          </div>          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-center mt-12"
           >
-            <button className="bg-vault-light hover:bg-vault-light/80 text-white px-8 py-3 rounded-xl font-semibold transition-all hover:scale-105">
+            <Link
+              to="/browse"
+              className="bg-gradient-to-r from-vault-accent to-green-400 hover:from-green-400 hover:to-vault-accent text-black px-10 py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-300 hover:scale-105 glow-green inline-block"
+            >
               View All Snippets
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>

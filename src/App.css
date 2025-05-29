@@ -1,5 +1,80 @@
 /* Custom styles for Code Vault HQ */
 
+/* Glow effects */
+.glow-green {
+  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glow-green:hover {
+  box-shadow: 0 8px 40px rgba(0, 255, 136, 0.5);
+  transform: translateY(-2px);
+}
+
+.glow-purple {
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glow-purple:hover {
+  box-shadow: 0 8px 40px rgba(139, 92, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Retro button styling */
+.retro-button {
+  background: linear-gradient(45deg, #00ff88, #00cc6a);
+  border: 2px solid #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.retro-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.retro-button:hover::before {
+  left: 100%;
+}
+
+.retro-button-outline {
+  background: transparent;
+  border: 2px solid #8b5cf6;
+  color: #8b5cf6;
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.retro-button-outline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.retro-button-outline:hover::before {
+  left: 100%;
+}
+
+.retro-button-outline:hover {
+  background: #8b5cf6;
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
 /* Line clamp utilities */
 .line-clamp-2 {
   display: -webkit-box;
