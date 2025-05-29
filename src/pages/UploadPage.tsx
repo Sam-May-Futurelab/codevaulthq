@@ -105,18 +105,16 @@ const UploadPage = () => {
     console.log('Submitting snippet:', snippetData);
     alert('Snippet submission will be implemented with backend integration!');
   };
-
-  return (
-    <div className="min-h-screen pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  return (    <div className="min-h-screen pt-12 pb-20">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-20"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">
             Upload Your <span className="text-vault-accent">Snippet</span>
           </h1>
           <p className="text-xl text-gray-400">
@@ -124,17 +122,16 @@ const UploadPage = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Panel - Form & Editor */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-6"
+            transition={{ duration: 0.6, delay: 0.2 }}            className="space-y-10"
           >
             {/* Basic Info */}
-            <div className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+            <div className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-8">
+              <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
                 <Upload className="w-5 h-5 mr-2 text-vault-accent" />
                 Snippet Details
               </h3>

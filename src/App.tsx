@@ -14,7 +14,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-vault-dark to-vault-medium">
         <Header />
-        <main>
+        <main className="pt-16 space-y-20">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/snippet/:id" element={<SnippetDetail />} />

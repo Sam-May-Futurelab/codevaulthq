@@ -27,10 +27,16 @@
 /* Retro button styling */
 .retro-button {
   background: linear-gradient(45deg, #00ff88, #00cc6a);
-  border: 2px solid #00ff88;
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  border: 3px solid #00ff88;
+  color: #000000;
+  text-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
   position: relative;
   overflow: hidden;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 136, 0.4),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  font-weight: 900;
+  letter-spacing: 0.05em;
 }
 
 .retro-button::before {
@@ -40,7 +46,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   transition: left 0.5s;
 }
 
@@ -48,13 +54,27 @@
   left: 100%;
 }
 
+.retro-button:hover {
+  box-shadow: 
+    0 0 30px rgba(0, 255, 136, 0.6),
+    0 0 40px rgba(0, 255, 136, 0.4),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
 .retro-button-outline {
-  background: transparent;
-  border: 2px solid #8b5cf6;
-  color: #8b5cf6;
-  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  background: rgba(26, 26, 26, 0.8);
+  border: 3px solid #8b5cf6;
+  color: #ffffff;
+  text-shadow: 0 0 15px rgba(139, 92, 246, 0.8);
   position: relative;
   overflow: hidden;
+  box-shadow: 
+    0 0 20px rgba(139, 92, 246, 0.4),
+    inset 0 0 20px rgba(139, 92, 246, 0.1);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(10px);
 }
 
 .retro-button-outline::before {
@@ -64,7 +84,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
   transition: left 0.5s;
 }
 
@@ -73,9 +93,14 @@
 }
 
 .retro-button-outline:hover {
-  background: #8b5cf6;
-  color: white;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 0 30px rgba(139, 92, 246, 0.6),
+    0 0 40px rgba(139, 92, 246, 0.4),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Line clamp utilities */
@@ -392,6 +417,107 @@
   }
 }
 
+/* Enhanced mobile spacing */
+@media (max-width: 640px) {
+  .hero-spacing {
+    padding: 3rem 1rem;
+  }
+  
+  .section-spacing-mobile {
+    padding: 3rem 0;
+  }
+  
+  .card-spacing-mobile {
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .text-spacing-mobile h1 {
+    margin-bottom: 1rem;
+  }
+  
+  .text-spacing-mobile h2 {
+    margin-bottom: 0.75rem;
+  }
+  
+  .text-spacing-mobile p {
+    margin-bottom: 0.75rem;
+  }
+  
+  .button-spacing-mobile {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+/* Container improvements */
+.content-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .content-container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-container {
+    padding: 0 2.5rem;
+  }
+}
+
+/* Section separator spacing */
+.section-separator {
+  margin: 4rem 0;
+}
+
+.section-separator-lg {
+  margin: 6rem 0;
+}
+
+@media (max-width: 768px) {
+  .section-separator {
+    margin: 2.5rem 0;
+  }
+  
+  .section-separator-lg {
+    margin: 3.5rem 0;
+  }
+}
+
+/* Form field spacing improvements */
+.form-field {
+  margin-bottom: 1.5rem;
+}
+
+.form-field:last-child {
+  margin-bottom: 0;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  ring: 2px solid var(--vault-accent);
+}
+
 /* Dark/light theme toggle preparation */
 .theme-toggle {
   position: fixed;
@@ -621,6 +747,11 @@
 }
 
 /* Snippet card enhancements */
+.snippet-card {
+  max-width: 280px;
+  height: 392px; /* 5:7 aspect ratio at 280px width */
+}
+
 .snippet-card .interactive-card {
   transform-origin: center center;
 }
@@ -630,6 +761,39 @@
   box-shadow: 
     0 25px 50px rgba(0, 0, 0, 0.4),
     0 0 40px rgba(14, 165, 233, 0.3);
+}
+
+/* Playing card dimensions for grid layouts */
+.snippet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  justify-items: center;
+}
+
+/* Mobile responsive card sizing */
+@media (max-width: 768px) {
+  .snippet-card {
+    max-width: 260px;
+    height: 364px; /* Maintain 5:7 aspect ratio */
+  }
+  
+  .snippet-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .snippet-card {
+    max-width: 240px;
+    height: 336px; /* Maintain 5:7 aspect ratio */
+  }
+  
+  .snippet-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 /* Performance optimizations for mobile */
@@ -663,5 +827,94 @@
   .magnetic-button:hover,
   .interactive-card:hover {
     transform: none;
+  }
+}
+
+/* Global spacing improvements */
+.page-container {
+  padding-top: 1rem;
+}
+
+/* Section spacing utilities */
+.section-spacing {
+  padding: 6rem 0;
+}
+
+.section-spacing-lg {
+  padding: 8rem 0;
+}
+
+.content-spacing {
+  margin-bottom: 2rem;
+}
+
+.content-spacing-lg {
+  margin-bottom: 3rem;
+}
+
+/* Enhanced form spacing */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.875rem 1rem;
+}
+
+/* Card spacing improvements */
+.card-content {
+  padding: 2rem;
+}
+
+.card-content-lg {
+  padding: 2.5rem;
+}
+
+/* List spacing */
+.list-spacing li {
+  margin-bottom: 1rem;
+}
+
+.list-spacing-lg li {
+  margin-bottom: 1.5rem;
+}
+
+/* Button spacing in groups */
+.button-group {
+  gap: 1.5rem;
+}
+
+.button-group-lg {
+  gap: 2rem;
+}
+
+/* Header spacing fix */
+.header-spacing {
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding-top: 0.5rem;
+  }
+  
+  .section-spacing {
+    padding: 4rem 0;
+  }
+  
+  .section-spacing-lg {
+    padding: 5rem 0;
+  }
+  
+  .card-content,
+  .card-content-lg {
+    padding: 1.5rem;
   }
 }

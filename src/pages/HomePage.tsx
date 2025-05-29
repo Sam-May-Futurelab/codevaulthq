@@ -92,45 +92,42 @@ const HomePage = () => {
     { icon: Users, label: 'Creators', value: '3,892', subtitle: 'Creative coders' },
     { icon: Download, label: 'Downloads', value: '89,234', subtitle: 'Code shared globally' },
     { icon: Star, label: 'Stars', value: '156,789', subtitle: 'Developer favorites' }
-  ];
-  return (
-    <div className="min-h-screen page-container">
+  ];  return (
+    <div className="min-h-screen">
       {/* Hero Section with 3D Background */}
-      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
-        <ThreeHero />
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-4 main-content">          <motion.h1
+      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden mb-40">
+        <ThreeHero /><div className="relative z-10 text-center max-w-4xl mx-auto px-6 py-24">
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-7xl md:text-9xl font-bold text-white mb-6 font-display tracking-tight floating"
+            className="text-7xl md:text-9xl font-bold text-white mb-20 font-display tracking-tight floating"
           >
             Code Vault
             <span className="bg-gradient-to-r from-vault-accent to-vault-purple bg-clip-text text-transparent">
               {' '}HQ
             </span>
           </motion.h1>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl text-zinc-400 mb-4 max-w-2xl mx-auto hero-subtitle floating"
-          >
-            Discover, share, and showcase beautiful interactive code snippets.
-            The ultimate vault for creative developers.
-          </motion.p>
             <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl md:text-2xl text-zinc-400 mb-8 max-w-2xl mx-auto hero-subtitle floating"
+          >
+            Discover, share, and showcase beautiful interactive code snippets.
+            The ultimate vault for creative developers.
+          </motion.p>            <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-sm md:text-base text-vault-accent mb-8 font-code scan-line floating"
+            className="text-sm md:text-base text-vault-accent mb-16 font-code scan-line floating"
           >
             12,547 snippets in the vault… and counting.
-          </motion.p><motion.div
+          </motion.p>            <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center"
+            className="flex flex-col sm:flex-row gap-10 justify-center"
           >            <Link
               to="/browse"
               className="magnetic-button gsap-button retro-button text-black px-10 py-4 rounded-xl font-bold text-lg uppercase tracking-wider transform transition-all duration-300 hover:scale-105 glow-green text-center"
@@ -161,9 +158,8 @@ const HomePage = () => {
           </div>
         </motion.div>
       </section>      {/* Stats Section */}
-      <section ref={statsRef} className="stats-section py-20 bg-gradient-to-br from-vault-dark via-vault-medium to-vault-dark border-y border-vault-accent/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section ref={statsRef} className="stats-section py-32 bg-gradient-to-br from-vault-dark via-vault-medium to-vault-dark border-y border-vault-accent/20 my-24">        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -171,34 +167,33 @@ const HomePage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="text-center group stat-card"
-              >                <div className="interactive-card bg-gradient-to-br from-vault-dark/80 to-vault-medium/80 rounded-xl p-8 border border-vault-accent/30 hover:border-vault-accent/60 transition-all duration-300 group-hover:scale-105 backdrop-blur-sm">
-                  <stat.icon className="w-10 h-10 text-vault-accent mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
-                  <div className="text-4xl font-bold text-white mb-2 font-mono stat-value">{stat.value}</div>
+              >                <div className="interactive-card bg-gradient-to-br from-vault-dark/80 to-vault-medium/80 rounded-xl p-12 border border-vault-accent/30 hover:border-vault-accent/60 transition-all duration-300 group-hover:scale-105 backdrop-blur-sm">                  <stat.icon className="w-12 h-12 text-vault-accent mx-auto mb-6 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="text-4xl font-bold text-white mb-4 font-mono stat-value">{stat.value}</div>
                   <div className="text-gray-300 uppercase tracking-wider text-sm font-semibold">{stat.label}</div>
-                  <div className="text-zinc-500 text-xs mt-1 italic">{stat.subtitle}</div>
+                  <div className="text-zinc-500 text-xs mt-2 italic">{stat.subtitle}</div>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Featured Snippets */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">          <motion.div
+      </section>      {/* Featured Snippets */}
+      <section className="py-32 mt-24">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-display">
+            className="text-center mb-24"
+          >            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 font-display">
               Trending <span className="text-vault-accent">Snippets</span>
             </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-2">
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-6">
               Discover the most popular code snippets from our community of creative developers
-            </p>            <p className="text-sm text-vault-accent font-code">
+            </p>
+            <p className="text-sm text-vault-accent font-code">
               ✨ Curated by creative coders across the cosmos
             </p>
-          </motion.div>          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          </motion.div><div className="snippet-grid">
             {featuredSnippets.map((snippet, index) => (
               <motion.div
                 key={snippet.id}
@@ -210,11 +205,11 @@ const HomePage = () => {
                 <SnippetCard snippet={snippet} />
               </motion.div>
             ))}
-          </div><motion.div
+          </div>          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center mt-12"
+            className="text-center mt-20"
           >            <Link
               to="/browse"
               className="magnetic-button gsap-button bg-gradient-to-r from-vault-accent to-green-400 hover:from-green-400 hover:to-vault-accent text-black px-10 py-4 rounded-xl font-bold text-lg uppercase tracking-wider transition-all duration-300 hover:scale-105 glow-green inline-block"
@@ -224,18 +219,17 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>      {/* Top 10 of the Month - Horizontal Scroll Carousel */}
-      <section className="top10-section py-16 bg-gradient-to-r from-vault-purple/10 via-transparent to-vault-accent/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="top10-section py-32 bg-gradient-to-r from-vault-purple/10 via-transparent to-vault-accent/10 my-24">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 font-display">
+            className="text-center mb-20"
+          >            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 font-display">
               🏆 Top 10 <span className="text-vault-purple">of the Month</span>
             </h2>
-            <p className="text-lg text-gray-400 mb-2">
+            <p className="text-lg text-gray-400 mb-6">
               The most impressive snippets developers are talking about
             </p>
             <p className="text-sm text-vault-purple font-code">
@@ -245,7 +239,7 @@ const HomePage = () => {
 
           {/* Horizontal Scroll Container */}
           <div className="relative">
-            <div className="flex space-x-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-vault-dark scrollbar-thumb-vault-accent/50">
+            <div className="flex space-x-8 overflow-x-auto pb-6 scrollbar-thin scrollbar-track-vault-dark scrollbar-thumb-vault-accent/50">
               {featuredSnippets.concat(featuredSnippets).map((snippet, index) => (
                 <motion.div
                   key={`top10-${snippet.id}-${index}`}
@@ -288,19 +282,18 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Tag Cloud Section */}
-      <section className="py-20 bg-vault-medium/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">          <motion.div
+      </section>      {/* Tag Cloud Section */}
+      <section className="py-32 bg-vault-medium/30 mt-24">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-display">
+            className="text-center mb-24"
+          >            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 font-display">
               Explore by <span className="text-vault-purple">Tags</span>
             </h2>
-            <p className="text-xl text-gray-400 mb-2">
+            <p className="text-xl text-gray-400 mb-6">
               Find exactly what you're looking for
             </p>
             <p className="text-sm text-vault-purple font-code">
@@ -311,15 +304,14 @@ const HomePage = () => {
           <TagCloud />
         </div>
       </section>      {/* Trending Tags */}
-      <section className="trending-section py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="trending-section py-32 mt-24">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 font-display">
+            className="text-center mb-20"
+          >            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 font-display">
               🔥 Trending <span className="text-vault-accent">Tags</span>
             </h2>
             <p className="text-lg text-gray-400">
@@ -327,7 +319,7 @@ const HomePage = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
             {/*
               Replace with dynamic data as needed
             */}
@@ -337,12 +329,11 @@ const HomePage = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}                whileHover={{ scale: 1.05, y: -5 }}
-                className="trending-tag interactive-card bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-4 text-center hover:border-vault-accent/50 transition-all duration-300 cursor-pointer group"
-              >
-                <div className="text-2xl font-bold text-white mb-1 font-mono">{Math.floor(Math.random() * 1000)}</div>
-                <div className="text-sm text-gray-300 mb-2">{tag}</div>
+                className="trending-tag interactive-card bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-8 text-center hover:border-vault-accent/50 transition-all duration-300 cursor-pointer group"
+              >                <div className="text-2xl font-bold text-white mb-2 font-mono">{Math.floor(Math.random() * 1000)}</div>
+                <div className="text-sm text-gray-300 mb-3">{tag}</div>
                 <div className="text-xs text-vault-accent font-semibold">{`+${Math.floor(Math.random() * 30)}%`}</div>
-                <div className="mt-2 h-1 bg-vault-dark rounded-full overflow-hidden">
+                <div className="mt-3 h-1 bg-vault-dark rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${Math.random() * 60 + 40}%` }}

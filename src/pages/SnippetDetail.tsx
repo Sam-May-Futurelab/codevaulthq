@@ -60,35 +60,30 @@ document.querySelector('.orb').addEventListener('mouseout', function() {
     category: 'css',
     createdAt: '2025-05-20',
     license: 'MIT'
-  };
-
-  return (
-    <div className="min-h-screen pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  };  return (
+    <div className="min-h-screen pt-12 pb-20">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Header */}
-            <motion.div
+            {/* Header */}            <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mb-8"
+              className="mb-12"
             >
-              <h1 className="text-4xl font-bold text-white mb-4">{snippet.title}</h1>
+              <h1 className="text-4xl font-bold text-white mb-8">{snippet.title}</h1>
               <p className="text-gray-400 text-lg">{snippet.description}</p>
             </motion.div>
 
-            {/* Preview */}
-            <motion.div
+            {/* Preview */}            <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6 mb-8"
-            >
-              <div className="flex items-center justify-between mb-4">
+              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-10 mb-12"
+            >              <div className="flex items-center justify-between mb-8">
                 <h2 className="text-xl font-semibold text-white">Live Preview</h2>
-                <button className="bg-vault-accent hover:bg-vault-accent/80 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                <button className="bg-vault-accent hover:bg-vault-accent/80 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors">
                   <Play className="w-4 h-4" />
                   <span>Run</span>
                 </button>
@@ -134,18 +129,15 @@ document.querySelector('.orb').addEventListener('mouseout', function() {
                 </pre>
               </div>
             </motion.div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
+          </div>          {/* Sidebar */}
+          <div className="space-y-8">
             {/* Actions */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6"
+              transition={{ duration: 0.6, delay: 0.3 }}              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-8"
             >
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <button className="w-full bg-vault-accent hover:bg-vault-accent/80 text-white py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors">
                   <Download className="w-5 h-5" />
                   <span>Download ZIP</span>
@@ -174,11 +166,10 @@ document.querySelector('.orb').addEventListener('mouseout', function() {
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6"
+              transition={{ duration: 0.6, delay: 0.4 }}              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-8"
             >
-              <h3 className="text-lg font-semibold text-white mb-4">Statistics</h3>
-              <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-white mb-6">Statistics</h3>
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-gray-400">
                     <Eye className="w-4 h-4" />
@@ -209,10 +200,9 @@ document.querySelector('.orb').addEventListener('mouseout', function() {
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6"
+              transition={{ duration: 0.6, delay: 0.5 }}              className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-8"
             >
-              <h3 className="text-lg font-semibold text-white mb-4">Tags</h3>
+              <h3 className="text-lg font-semibold text-white mb-6">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {snippet.tags.map((tag) => (
                   <span
