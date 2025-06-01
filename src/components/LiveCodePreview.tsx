@@ -129,7 +129,7 @@ const LiveCodePreview: React.FC<LiveCodePreviewProps> = ({
         </div>
       </div>
       
-      <div className="relative bg-black/20 rounded border border-vault-light/20 overflow-hidden">
+      <div className="relative bg-black/20 rounded border border-vault-light/20 overflow-hidden flex items-center justify-center" style={{ minHeight: '300px' }}>
         {error ? (
           <div className="w-full h-64 flex items-center justify-center text-red-400 bg-red-500/10 border border-red-500/20 rounded">
             <div className="text-center">
@@ -153,13 +153,15 @@ const LiveCodePreview: React.FC<LiveCodePreviewProps> = ({
                 </div>
               </div>
             )}
-            <iframe
-              ref={iframeRef}
-              className="w-full h-64 border-0 bg-transparent"
-              title="Code Preview"
-              sandbox="allow-scripts allow-same-origin"
-              style={{ minHeight: '300px' }}
-            />
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+              <iframe
+                ref={iframeRef}
+                className="w-full h-64 border-0 bg-transparent"
+                title="Code Preview"
+                sandbox="allow-scripts allow-same-origin"
+                style={{ minHeight: '300px', transform: 'scale(1.25)', transformOrigin: 'center' }}
+              />
+            </div>
           </>
         )}
       </div>

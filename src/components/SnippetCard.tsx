@@ -1,7 +1,7 @@
 import { Heart, Eye, ExternalLink, User, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import LivePreview from './LivePreview';
+import LiveCodePreviewSimple from './LiveCodePreviewSimple';
 import AudioFeedback from '../utils/AudioFeedback';
 import type { SnippetData } from '../data/snippets';
 
@@ -61,8 +61,10 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
         ) : (
           <div className="w-full h-full relative">            {/* Live Preview - Fill entire dedicated section */}
             <div className="w-full h-full">
-              <LivePreview 
-                type={snippet.category as 'css' | 'canvas' | 'javascript' | 'animation' | 'webgl' | 'react' | 'vue'} 
+              <LiveCodePreviewSimple 
+                html={snippet.code.html}
+                css={snippet.code.css}
+                javascript={snippet.code.javascript}
                 className="w-full h-full"
               />
             </div>

@@ -620,8 +620,11 @@ const LivePreview = ({ type, className = "" }: LivePreviewProps) => {
   };
 
   return (
-    <div className={`${className}`}>
-      {renderPreview()}
+    <div className={`w-full h-full flex items-center justify-center overflow-hidden ${className}`}
+         style={{ minHeight: 0, minWidth: 0 }}>
+      <div style={{ transform: 'scale(1.35)', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {renderPreview()}
+      </div>
     </div>
   );
 };
