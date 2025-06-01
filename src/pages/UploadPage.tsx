@@ -68,14 +68,13 @@ const UploadPage = () => {
       }
     };
   }, [snippetData.htmlCode, snippetData.cssCode, snippetData.jsCode, debouncedUpdatePreview]);
-
   const categories = [
-    { id: 'css', label: 'CSS', icon: Palette, color: 'text-blue-400' },
-    { id: 'javascript', label: 'JavaScript', icon: Code2, color: 'text-yellow-400' },
-    { id: 'html', label: 'HTML', icon: FileImage, color: 'text-orange-400' },
-    { id: 'canvas', label: 'Canvas', icon: Code2, color: 'text-purple-400' },
-    { id: 'webgl', label: 'WebGL', icon: Code2, color: 'text-green-400' },
-    { id: 'animation', label: 'Animation', icon: Play, color: 'text-pink-400' }
+    { id: 'ui-components', label: 'UI Components', icon: Code2, color: 'text-blue-400' },
+    { id: 'animations', label: 'Animations', icon: Play, color: 'text-purple-400' },
+    { id: 'layouts', label: 'Layouts', icon: FileImage, color: 'text-green-400' },
+    { id: 'effects', label: 'Visual Effects', icon: Palette, color: 'text-pink-400' },
+    { id: 'games', label: 'Games & Interactive', icon: Code2, color: 'text-orange-400' },
+    { id: 'utilities', label: 'Tools & Utilities', icon: Code2, color: 'text-gray-400' }
   ];
 
   const editorTabs = [
@@ -174,8 +173,7 @@ const UploadPage = () => {
     } else {
       console.error('Preview iframe reference not found');
     }
-  };
-  // Manual save function (for Ctrl+S and save button)
+  };  // Manual save function (for Ctrl+S and save button)
   const handleManualSave = () => {
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
@@ -184,6 +182,9 @@ const UploadPage = () => {
     generatePreview();
     setLastSaved(new Date());
     setTimeout(() => setIsPreviewUpdating(false), 300);
+    
+    // Show a success toast
+    window.showToast?.('Preview updated', 'success');
   };
   // Handle submission of the snippet
   const handleSubmit = async () => {
@@ -306,10 +307,10 @@ const UploadPage = () => {
                     placeholder="Describe your snippet and its functionality"
                   />
                 </div>                <div>
-                  <label className="block text-xl font-bold text-gray-700 mb-8">
+                  <label className="block text-base font-semibold text-gray-700 mb-4">
                     Category
                   </label>
-                  <div className="grid grid-cols-2 gap-6 mb-4">{/* Changed from 3 cols to 2 cols with more gap */}
+                  <div className="grid grid-cols-3 gap-3 mb-4">
                     {categories.map((category) => (
                       <button
                         key={category.id}
@@ -320,20 +321,20 @@ const UploadPage = () => {
                           window.showToast?.(`Category selected: ${category.label}`, 'info');
                         }}
                         type="button"
-                        className={`p-8 rounded-2xl border-3 transition-all duration-300 cursor-pointer min-h-[120px] flex flex-col items-center justify-center ${
+                        className={`p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer min-h-[60px] flex flex-col items-center justify-center ${
                           snippetData.category === category.id
-                            ? 'border-vault-accent bg-vault-accent/15 text-vault-accent shadow-2xl transform scale-105'
-                            : 'border-gray-300 bg-white hover:border-vault-accent/60 text-gray-700 hover:shadow-xl hover:transform hover:scale-102 hover:bg-gray-50'
+                            ? 'border-vault-accent bg-vault-accent/15 text-vault-accent shadow-lg transform scale-105'
+                            : 'border-gray-300 bg-white hover:border-vault-accent/60 text-gray-700 hover:shadow-md hover:transform hover:scale-102 hover:bg-gray-50'
                         }`}
                       >
-                        <category.icon className={`w-10 h-10 mb-4 ${
+                        <category.icon className={`w-5 h-5 mb-1 ${
                           snippetData.category === category.id ? 'text-vault-accent' : 'text-gray-600'
                         }`} />
-                        <div className="text-lg font-bold">{category.label}</div>
+                        <div className="text-sm font-semibold">{category.label}</div>
                       </button>
                     ))}
                   </div>
-                </div>                <div>
+                </div><div>
                   <label className="block text-xl font-bold text-gray-700 mb-8">
                     Tags
                   </label>
@@ -449,9 +450,9 @@ const UploadPage = () => {
                     </button>
                   </div>
                 </div>
-              </div>              {/* Editor Tabs */}
-              <div className="bg-white border-b border-gray-200">
-                <div className="flex space-x-4 px-12 py-6">{/* Added more spacing */}
+              </div>              {/* Editor Tabs - Made Much More Prominent */}
+              <div className="bg-gradient-to-r from-slate-100 to-slate-200 border-b-2 border-gray-300 py-4">
+                <div className="flex justify-center space-x-8 px-12">
                   {editorTabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -463,15 +464,20 @@ const UploadPage = () => {
                         setActiveTab(tab.id as 'html' | 'css' | 'js');
                         window.showToast?.(`Switched to ${tab.label} editor`, 'info');
                       }}
-                      className={`px-12 py-8 text-2xl font-bold transition-all duration-200 border-b-4 cursor-pointer relative rounded-t-xl ${
+                      className={`px-16 py-6 text-3xl font-black transition-all duration-300 border-4 cursor-pointer relative rounded-2xl min-w-[180px] transform hover:scale-105 shadow-xl ${
                         activeTab === tab.id
-                          ? 'text-vault-accent border-vault-accent bg-vault-accent/15 shadow-lg'
-                          : 'text-gray-600 border-transparent hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300'
+                          ? 'text-white bg-gradient-to-r from-vault-accent to-green-500 border-vault-accent shadow-2xl scale-110 ring-4 ring-vault-accent/30'
+                          : 'text-gray-700 bg-white border-gray-300 hover:text-vault-accent hover:border-vault-accent hover:shadow-2xl hover:bg-vault-accent/5'
                       }`}
                     >
-                      {tab.label}
-                      {activeTab === tab.id && (
-                        <span className="absolute -top-3 -right-3 w-5 h-5 bg-vault-accent rounded-full border-3 border-white shadow-lg"></span>
+                      <div className="flex flex-col items-center space-y-2">
+                        <span className="text-4xl">
+                          {tab.id === 'html' ? '🌐' : tab.id === 'css' ? '🎨' : '⚡'}
+                        </span>
+                        <span className="font-black tracking-wider">{tab.label}</span>
+                      </div>                      {activeTab === tab.id && (
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full border-4 border-white shadow-lg">
+                        </div>
                       )}
                     </button>
                   ))}
@@ -481,19 +487,18 @@ const UploadPage = () => {
               {/* Editor Settings */}
               <div className="bg-slate-50 px-12 py-10 border-b border-gray-200">{/* Increased padding */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-16">{/* Increased spacing between controls */}
-                    <div className="flex items-center space-x-6">{/* Increased spacing within each control */}
+                  <div className="flex items-center space-x-16">{/* Increased spacing between controls */}                    <div className="flex items-center space-x-6">{/* Increased spacing within each control */}
                       <label className="text-lg font-bold text-gray-700">Font Size:</label>
                       <select 
                         value={editorFontSize} 
                         onChange={(e) => setEditorFontSize(Number(e.target.value))}
                         className="bg-white border-2 border-gray-300 rounded-xl px-5 py-3 text-lg text-gray-700 focus:border-vault-accent focus:ring-2 focus:ring-vault-accent/20 shadow-md"
                       >
-                        <option value={12}>12px</option>
-                        <option value={14}>14px</option>
-                        <option value={16}>16px</option>
-                        <option value={18}>18px</option>
-                        <option value={20}>20px</option>
+                        <option className="text-gray-800" value={12}>12px</option>
+                        <option className="text-gray-800" value={14}>14px</option>
+                        <option className="text-gray-800" value={16}>16px</option>
+                        <option className="text-gray-800" value={18}>18px</option>
+                        <option className="text-gray-800" value={20}>20px</option>
                       </select>
                     </div>
 
@@ -552,8 +557,9 @@ const UploadPage = () => {
                     // Add Ctrl+S keyboard shortcut
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
                       handleManualSave();
+                      return true; // Event handled
                     });
-                  }}                  theme="vs-dark"
+                  }}theme="vs-dark"
                   options={{
                     fontSize: editorFontSize,
                     fontFamily: 'JetBrains Mono, Monaco, Consolas, monospace',
@@ -648,12 +654,17 @@ const UploadPage = () => {
                   sandbox="allow-scripts"
                 />
               </div>
-            </div>
-
-            {/* Submit Button */}
+            </div>            {/* Submit Button */}
             <motion.button
-              onClick={currentUser ? handleSubmit : () => setIsAuthModalOpen(true)}
-              disabled={false}
+              onClick={() => {
+                if (!currentUser) {
+                  setIsAuthModalOpen(true);
+                  window.showToast?.('Please sign in to continue', 'info');
+                } else {
+                  handleSubmit();
+                }
+              }}
+              disabled={isPreviewUpdating}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={`w-full py-6 rounded-2xl font-bold text-xl uppercase tracking-wider transition-all duration-300 shadow-xl hover:shadow-2xl ${
@@ -662,7 +673,7 @@ const UploadPage = () => {
                   : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white cursor-pointer transform hover:scale-105'
               }`}
             >              <Save className="w-6 h-6 inline mr-3" />
-              {currentUser ? '🚀 Publish Snippet' : '🔐 Sign In to Publish'}            </motion.button>          </motion.div>
+              {currentUser ? '🚀 Publish Snippet' : '🔐 Sign In to Publish'}            </motion.button></motion.div>
         </div>
       </div>
 

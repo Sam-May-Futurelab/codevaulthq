@@ -91,6 +91,6 @@ export const ToastContainer = () => {
 // Add to global window type
 declare global {
   interface Window {
-    showToast: (message: string, type: 'success' | 'error' | 'info', duration?: number) => void;
+    showToast?: (message: string, type: 'success' | 'error' | 'info', duration?: number) => void;
   }
 }
