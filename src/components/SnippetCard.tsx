@@ -1,16 +1,65 @@
-import { Heart, Eye, ExternalLink, User, CheckCircle } from 'lucide-react';
+import { Heart, Eye, User, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import LiveCodePreviewSimple from './LiveCodePreviewSimple';
 import AudioFeedback from '../utils/AudioFeedback';
+import { useSnippetInteraction } from '../hooks/useSnippetData';
 import type { SnippetData } from '../data/snippets';
+import type { SnippetWithAnalytics } from '../services/SnippetApiService';
 
 interface SnippetCardProps {
-  snippet: SnippetData;
+  snippet: SnippetData | SnippetWithAnalytics;
 }
 
 const SnippetCard = ({ snippet }: SnippetCardProps) => {
   const audio = AudioFeedback.getInstance();
+  const { trackView, trackLike, trackDownload } = useSnippetInteraction();
+  const [isLiked, setIsLiked] = useState(false);
+  const [localStats, setLocalStats] = useState(snippet.stats);
+
+  // Track view when component mounts
+  useEffect(() => {
+    trackView(snippet.id);
+  }, [snippet.id, trackView]);
+
+  // Helper function to check if snippet has analytics data
+  const hasAnalytics = (s: SnippetData | SnippetWithAnalytics): s is SnippetWithAnalytics => {
+    return 'analytics' in s;
+  };
+
+  // Get current stats - use analytics if available, fallback to basic stats
+  const currentStats = hasAnalytics(snippet) ? {
+    likes: snippet.analytics.metrics.likes,
+    views: snippet.analytics.metrics.views,
+    downloads: snippet.analytics.metrics.downloads,
+    comments: snippet.analytics.metrics.comments
+  } : localStats;
+  // Handle like interaction
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    audio.playClick();
+    
+    try {
+      await trackLike(snippet.id);
+      setIsLiked(!isLiked);
+      setLocalStats(prev => ({
+        ...prev,
+        likes: isLiked ? prev.likes - 1 : prev.likes + 1
+      }));
+    } catch (error) {
+      console.warn('Failed to track like:', error);
+    }
+  };
+  // Handle download tracking when viewing code
+  const handleViewCode = async () => {
+    try {
+      await trackDownload(snippet.id);
+    } catch (error) {
+      console.warn('Failed to track download:', error);
+    }
+  };
   const categoryColors = {
     css: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
     javascript: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
@@ -31,17 +80,16 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
     react: '⚛️',
     vue: '💚',
     animation: '✨'
-  };return (
+  };  return (
     <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      onHoverStart={() => audio.playHover()}      className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden group hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-none flex flex-col"
+      // Removed whileHover and onHoverStart to prevent interference with snippet interactions
+      className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-none flex flex-col"
       style={{ 
         height: '480px', 
         minHeight: '480px', 
         maxHeight: '480px' 
       }}
-    >      {/* DEDICATED LIVE PREVIEW SECTION - Exactly 260px height */}
+    >{/* DEDICATED LIVE PREVIEW SECTION - Exactly 260px height */}
       <div 
         className="relative bg-gradient-to-br from-vault-dark to-vault-medium overflow-hidden flex-shrink-0"
         style={{ 
@@ -63,19 +111,10 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
                 html={snippet.code.html}
                 css={snippet.code.css}
                 javascript={snippet.code.javascript}
-                className="w-full h-full"
-              />
-            </div>
-            
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-              <div className="bg-vault-dark/80 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center space-x-2">
-                <ExternalLink className="w-4 h-4 text-vault-accent" />
-                <span className="text-white text-sm font-medium">View Details</span>
-              </div>
+                className="w-full h-full"            />
             </div>
           </div>
-        )}        {/* Category Badge - Positioned bottom-right of preview for better visibility */}
+        )}{/* Category Badge - Positioned bottom-right of preview for better visibility */}
         <div 
           className="absolute bottom-3 right-3 z-20" 
           style={{ 
@@ -105,20 +144,17 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
             </span>
             {snippet.category.toUpperCase()}
           </span>
-        </div>
-
-        {/* Like Button */}
+        </div>        {/* Like Button */}
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
-            onClick={(e) => {
-              e.preventDefault();
-              audio.playClick();
-            }}
-            className="bg-vault-dark/80 hover:bg-vault-dark text-white p-2 rounded-lg backdrop-blur-sm transition-colors"
+            onClick={handleLike}
+            className={`bg-vault-dark/80 hover:bg-vault-dark text-white p-2 rounded-lg backdrop-blur-sm transition-colors ${
+              isLiked ? 'text-red-400' : ''
+            }`}
           >
-            <Heart className="w-4 h-4" />
+            <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
           </button>
-        </div>      </div>      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}
+        </div></div>      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}
       <div 
         className="p-4 flex flex-col justify-between flex-shrink-0"
         style={{ 
@@ -206,23 +242,22 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
                   <span className="text-xs">✨</span>
                 )}
               </div>
-            </Link>
-
-            {/* Stats */}
+            </Link>            {/* Stats */}
             <div className="flex items-center space-x-3 text-gray-400">
               <div className="flex items-center space-x-1">
                 <Heart className="w-3 h-3" />
-                <span className="text-xs">{snippet.stats.likes}</span>
+                <span className="text-xs">{currentStats.likes}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Eye className="w-3 h-3" />
-                <span className="text-xs">{snippet.stats.views}</span>
+                <span className="text-xs">{currentStats.views}</span>
               </div>
             </div>
           </div>          {/* Action Buttons */}
           <div className="mt-4 pt-2">
             <Link
               to={`/snippet/${snippet.id}`}
+              onClick={handleViewCode}
               className="w-full bg-vault-accent hover:bg-vault-accent/80 text-black py-2.5 px-4 rounded-lg text-sm font-medium transition-colors text-center block"
             >
               View Code

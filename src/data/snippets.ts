@@ -394,20 +394,13 @@ document.querySelector('.action-btn').addEventListener('click', function() {
   btn.style.background = '#4ade80';
   btn.style.borderColor = '#4ade80';
   btn.style.color = 'white';
-  
-  setTimeout(() => {
+    setTimeout(() => {
     btn.textContent = originalText;
     btn.style.background = 'rgba(255,255,255,0.2)';
     btn.style.borderColor = 'white';
     btn.style.color = 'white';
   }, 2000);
-});
-
-// Add random flip animation every 5 seconds
-setInterval(() => {
-  const card = document.querySelector('.flip-card');
-  card.style.transform = card.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)';
-}, 5000);`
+});`
     }
   }
 };
