@@ -92,11 +92,9 @@ const HomePage = () => {
     { icon: Users, label: 'Creators', value: '3,892', subtitle: 'Creative coders' },
     { icon: Download, label: 'Downloads', value: '89,234', subtitle: 'Code shared globally' },
     { icon: Star, label: 'Stars', value: '156,789', subtitle: 'Developer favorites' }  ];
-
   return (
-    <div className="min-h-screen">
-      {/* Hero Section with 3D Background */}
-      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden mb-40">
+    <>      {/* Hero Section with 3D Background - Full Width */}
+      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden mb-40 -mx-4 -mt-8">
         <ThreeHero />
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-6 py-24">
@@ -158,10 +156,13 @@ const HomePage = () => {
               transition={{ duration: 1.5, repeat: Infinity }}
               className="w-1 h-3 bg-vault-accent rounded-full mt-2"
             />
-          </div>
-        </motion.div>
-      </section>      {/* Stats Section */}
-      <section ref={statsRef} className="stats-section py-32 bg-gradient-to-br from-vault-dark via-vault-medium to-vault-dark border-y border-vault-accent/20 my-24">        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          </div>        </motion.div>
+      </section>      {/* Rest of content - Full Width */}
+      <div className="px-4">
+      
+      {/* Stats Section */}
+      <section ref={statsRef} className="stats-section py-32 bg-gradient-to-br from-vault-dark via-vault-medium to-vault-dark border-y border-vault-accent/20 my-24">
+        <div className="px-6 sm:px-8 lg:px-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             {stats.map((stat, index) => (
               <motion.div
@@ -181,7 +182,7 @@ const HomePage = () => {
         </div>
       </section>      {/* Featured Snippets */}
       <section className="py-32 mt-24">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="px-6 sm:px-8 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -223,7 +224,7 @@ const HomePage = () => {
         </div>
       </section>      {/* Top 10 of the Month - Horizontal Scroll Carousel */}
       <section className="top10-section py-32 bg-gradient-to-r from-vault-purple/10 via-transparent to-vault-accent/10 my-24">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="px-6 sm:px-8 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -238,17 +239,14 @@ const HomePage = () => {
             <p className="text-sm text-vault-purple font-code">
               🚀 Ranked by community engagement and creativity
             </p>
-          </motion.div>
-
-          {/* Horizontal Scroll Container */}
+          </motion.div>          {/* Horizontal Scroll Container */}
           <div className="relative">
-            <div className="flex space-x-8 overflow-x-auto pb-6 scrollbar-thin scrollbar-track-vault-dark scrollbar-thumb-vault-accent/50">
-              {featuredSnippets.concat(featuredSnippets).map((snippet, index) => (
-                <motion.div
-                  key={`top10-${snippet.id}-${index}`}
-                  initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+            <div className="flex overflow-x-auto pb-6 scrollbar-thin scrollbar-track-vault-dark scrollbar-thumb-vault-accent/50" style={{paddingLeft: '24px', paddingRight: '24px'}}>
+              {featuredSnippets.concat(featuredSnippets).map((snippet, index) => (                <motion.div
+                  key={`top10-${snippet.id}-${index}`}                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}                  className="flex-shrink-0 w-80 top10-item"
+                  style={{marginRight: index < featuredSnippets.concat(featuredSnippets).length - 1 ? '24px' : '0'}}
                 >
                   <div className="interactive-card relative bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-4 hover:border-vault-purple/50 transition-all duration-300 group">
                     <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-vault-purple to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -287,7 +285,7 @@ const HomePage = () => {
         </div>
       </section>      {/* Tag Cloud Section */}
       <section className="py-32 bg-vault-medium/30 mt-24">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="px-6 sm:px-8 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -308,7 +306,7 @@ const HomePage = () => {
         </div>
       </section>      {/* Trending Tags */}
       <section className="trending-section py-32 mt-24">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="px-6 sm:px-8 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -343,13 +341,13 @@ const HomePage = () => {
                     transition={{ duration: 1, delay: index * 0.1 }}
                     className="h-full bg-gradient-to-r from-vault-accent to-vault-purple rounded-full"
                   />
-                </div>
-              </motion.div>
+                </div>              </motion.div>
             ))}
-          </div>
-        </div>
+          </div>        </div>
       </section>
-    </div>
+      
+      </div>
+    </>
   );
 };
 
