@@ -91,12 +91,15 @@ const HomePage = () => {
     { icon: Code, label: 'Snippets', value: '12,547', subtitle: 'Interactive treasures' },
     { icon: Users, label: 'Creators', value: '3,892', subtitle: 'Creative coders' },
     { icon: Download, label: 'Downloads', value: '89,234', subtitle: 'Code shared globally' },
-    { icon: Star, label: 'Stars', value: '156,789', subtitle: 'Developer favorites' }
-  ];  return (
+    { icon: Star, label: 'Stars', value: '156,789', subtitle: 'Developer favorites' }  ];
+
+  return (
     <div className="min-h-screen">
       {/* Hero Section with 3D Background */}
       <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden mb-40">
-        <ThreeHero /><div className="relative z-10 text-center max-w-4xl mx-auto px-6 py-24">
+        <ThreeHero />
+
+        <div className="relative z-10 text-center max-w-4xl mx-auto px-6 py-24">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

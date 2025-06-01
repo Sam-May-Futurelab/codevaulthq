@@ -103,10 +103,11 @@ const UploadPage = () => {
   const handleSubmit = () => {
     // TODO: Implement actual submission logic
     console.log('Submitting snippet:', snippetData);
-    alert('Snippet submission will be implemented with backend integration!');
-  };
-  return (    <div className="min-h-screen pt-12 pb-20">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+    alert('Snippet submission will be implemented with backend integration!');  };
+
+  return (
+    <div className="min-h-screen">
+      <div className="pt-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

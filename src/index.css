@@ -52,3 +52,43 @@ body {
 .glow-purple {
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
+
+/* Essential layout fixes for proper spacing */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Ensure proper spacing between grid items */
+.grid {
+  gap: 1.5rem;
+}
+
+/* Fix for cards and content blocks */
+.snippet-card, .bg-vault-medium, .bg-gray-800 {
+  margin-bottom: 1.5rem;
+}
+
+/* Proper spacing for main content areas */
+main {
+  padding: 2rem 0;
+}
+
+/* Fix for page containers */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+  .container, .page-container {
+    padding: 0 1rem;
+  }
+  
+  main {
+    padding: 1rem 0;
+  }
+}

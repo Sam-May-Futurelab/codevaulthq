@@ -9,19 +9,20 @@ import AudioToggle from './components/AudioToggle.tsx';
 import ThemeToggle from './components/ThemeToggle.tsx';
 import './App.css';
 
-function App() {
-  return (
+function App() {  return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-vault-dark to-vault-medium">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
         <Header />
-        <main className="pt-16 space-y-20">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/snippet/:id" element={<SnippetDetail />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/profile/:username" element={<ProfilePage />} />
-            <Route path="/browse" element={<BrowsePage />} />
-          </Routes>
+        <main>
+          <div className="container mx-auto px-6 py-8 max-w-7xl">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/snippet/:id" element={<SnippetDetail />} />
+              <Route path="/upload" element={<UploadPage />} />
+              <Route path="/profile/:username" element={<ProfilePage />} />
+              <Route path="/browse" element={<BrowsePage />} />
+            </Routes>
+          </div>
         </main>
         <AudioToggle />
         <ThemeToggle />

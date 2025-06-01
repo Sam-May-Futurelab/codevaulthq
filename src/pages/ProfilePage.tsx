@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 
 const ProfilePage = () => {
-  return (    <div className="min-h-screen pt-12 pb-20">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+  return (
+    <div className="min-h-screen">
+      <div className="pt-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

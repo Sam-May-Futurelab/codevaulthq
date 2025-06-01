@@ -123,14 +123,14 @@ const BrowsePage = () => {
         return 0; // Recent would need timestamp
     }
   });  return (
-    <div className="min-h-screen pt-12 pb-20">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+    <div className="min-h-screen">
+      <div className="pt-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-12"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">
             Browse <span className="text-vault-accent">Snippets</span>
@@ -145,9 +145,9 @@ const BrowsePage = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-10 mb-16"
+          className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6 mb-8"
         >          {/* Search Bar */}
-          <div className="relative mb-10">
+          <div className="relative mb-6">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -159,7 +159,7 @@ const BrowsePage = () => {
           </div>
 
           {/* Filters Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">            {/* Category Filter */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">            {/* Category Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-4">Category</label>
               <select
