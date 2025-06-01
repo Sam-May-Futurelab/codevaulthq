@@ -35,21 +35,19 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
-      onHoverStart={() => audio.playHover()}
-      className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden group hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-none flex flex-col"
+      onHoverStart={() => audio.playHover()}      className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden group hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-none flex flex-col"
       style={{ 
-        height: '420px', 
-        minHeight: '420px', 
-        maxHeight: '420px' 
+        height: '480px', 
+        minHeight: '480px', 
+        maxHeight: '480px' 
       }}
-    >
-      {/* DEDICATED LIVE PREVIEW SECTION - Exactly 200px height */}
+    >      {/* DEDICATED LIVE PREVIEW SECTION - Exactly 260px height */}
       <div 
         className="relative bg-gradient-to-br from-vault-dark to-vault-medium overflow-hidden flex-shrink-0"
         style={{ 
-          height: '200px', 
-          minHeight: '200px', 
-          maxHeight: '200px' 
+          height: '260px', 
+          minHeight: '260px', 
+          maxHeight: '260px' 
         }}
       >
         {snippet.thumbnailUrl ? (
@@ -120,9 +118,7 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
           >
             <Heart className="w-4 h-4" />
           </button>
-        </div>      </div>
-
-      {/* CONTENT SECTION - Exactly 220px remaining height (420px - 200px) */}
+        </div>      </div>      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}
       <div 
         className="p-4 flex flex-col justify-between flex-shrink-0"
         style={{ 

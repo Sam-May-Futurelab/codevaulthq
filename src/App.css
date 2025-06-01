@@ -785,9 +785,9 @@ a[href*="/snippet/"]:hover {
 
 /* FORCE consistent card dimensions */
 .snippet-grid > * {
-  height: 420px; /* Fixed total card height */
-  min-height: 420px;
-  max-height: 420px;
+  height: 480px; /* Fixed total card height - increased from 420px */
+  min-height: 480px;
+  max-height: 480px;
 }
 
 /* Mobile responsive card sizing */
@@ -796,11 +796,10 @@ a[href*="/snippet/"]:hover {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
-  .snippet-grid > * {
-    height: 380px; /* Slightly smaller on mobile */
-    min-height: 380px;
-    max-height: 380px;
+    .snippet-grid > * {
+    height: 440px; /* Slightly smaller on mobile - increased from 380px */
+    min-height: 440px;
+    max-height: 440px;
   }
 }
 
@@ -809,11 +808,10 @@ a[href*="/snippet/"]:hover {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
-  .snippet-grid > * {
-    height: 360px; /* Even smaller on small mobile */
-    min-height: 360px;
-    max-height: 360px;
+    .snippet-grid > * {
+    height: 420px; /* Even smaller on small mobile - increased from 360px */
+    min-height: 420px;
+    max-height: 420px;
   }
 }
 
