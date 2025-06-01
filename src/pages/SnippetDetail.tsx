@@ -1,70 +1,17 @@
-import { Play, Download, Copy, Heart, Eye, MessageCircle, Share, ArrowLeft } from 'lucide-react';
+import { Download, Copy, Heart, Eye, MessageCircle, Share, ArrowLeft } from 'lucide-react';
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
+import LiveCodePreview from '../components/LiveCodePreview';
+import { snippetsData } from '../data/snippets';
 
 const SnippetDetail = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState<'html' | 'css' | 'javascript'>('html');
 
-  // Mock data
-  const snippet = {
-    id: id || '1',
-    title: 'Canvas Particle System',
-    description: 'Dynamic particle effects using HTML5 Canvas with smooth animations and interactive mouse events.',
-    code: {
-      html: `<canvas id="particles" width="400" height="300"></canvas>`,
-      css: `#particles {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  cursor: crosshair;
-}`,
-      javascript: `const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-const particles = [];
-
-for(let i = 0; i < 50; i++) {
-  particles.push({
-    x: Math.random() * 400,
-    y: Math.random() * 300,
-    vx: (Math.random() - 0.5) * 3,
-    vy: (Math.random() - 0.5) * 3,
-    size: Math.random() * 4 + 1,
-    color: \`hsl(\${Math.random() * 360}, 70%, 70%)\`
-  });
-}
-
-function animate() {
-  ctx.clearRect(0, 0, 400, 300);
-  
-  particles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    
-    if(p.x < 0 || p.x > 400) p.vx *= -1;
-    if(p.y < 0 || p.y > 300) p.vy *= -1;
-    
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.fill();
-  });
-  
-  requestAnimationFrame(animate);
-}
-
-animate();`
-    },
-    stats: {
-      likes: 245,
-      views: 1250,
-      downloads: 89,
-      comments: 12
-    },    tags: ['canvas', 'particles', 'animation', 'javascript', 'interactive'],
-  };
-  return (
+  // Get snippet from centralized data
+  const snippet = snippetsData[id || '1'] || snippetsData['1'];return (
     <div className="min-h-screen">
-      <div className="pt-8">
+      <div className="max-w-7xl mx-auto pt-8">
       
       {/* Back Navigation */}
       <Link to="/browse" className="inline-flex items-center space-x-2 text-gray-400 hover:text-white mb-8">
@@ -76,26 +23,19 @@ animate();`
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-4">{snippet.title}</h1>
         <p className="text-gray-300">{snippet.description}</p>
-      </div>        {/* Simple Two Column Grid */}
+      </div>{/* Simple Two Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Main Content - Takes 2/3 width */}
-          <div className="lg:col-span-2">
-            
-            {/* Preview */}
-            <div className="bg-vault-medium rounded-lg p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-white font-semibold">Live Preview</h2>
-                <button className="bg-vault-accent hover:bg-vault-accent/80 text-black px-4 py-2 rounded flex items-center space-x-2">
-                  <Play className="w-4 h-4" />
-                  <span>Fullscreen</span>
-                </button>
-              </div>
-              <div className="bg-black/20 rounded border">
-                <div className="w-full h-64 bg-gray-700 rounded flex items-center justify-center">
-                  <span className="text-gray-400">Live Preview Coming Soon</span>
-                </div>
-              </div>            </div>
+          <div className="lg:col-span-2">            {/* Live Preview */}
+            <div className="mb-6">
+              <LiveCodePreview 
+                html={snippet.code.html}
+                css={snippet.code.css}
+                javascript={snippet.code.javascript}
+                title="Live Preview"
+              />
+            </div>
 
             {/* Code Tabs */}
             <div className="bg-vault-medium rounded-lg">

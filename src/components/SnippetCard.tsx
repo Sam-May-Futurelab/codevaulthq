@@ -3,28 +3,15 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import LivePreview from './LivePreview';
 import AudioFeedback from '../utils/AudioFeedback';
+import type { SnippetData } from '../data/snippets';
 
 interface SnippetCardProps {
-  snippet: {
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-    tags: string[];
-    author: {
-      username: string;
-      displayName: string;
-      isVerified: boolean;
-      isPro?: boolean;
-    };
-    likes: number;
-    views: number;
-    thumbnailUrl?: string;
-  };
+  snippet: SnippetData;
 }
 
 const SnippetCard = ({ snippet }: SnippetCardProps) => {
-  const audio = AudioFeedback.getInstance();  const categoryColors = {
+  const audio = AudioFeedback.getInstance();
+  const categoryColors = {
     css: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
     javascript: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
     html: 'bg-orange-500/20 text-orange-300 border-orange-400/30',
@@ -227,11 +214,11 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
             <div className="flex items-center space-x-3 text-gray-400">
               <div className="flex items-center space-x-1">
                 <Heart className="w-3 h-3" />
-                <span className="text-xs">{snippet.likes}</span>
+                <span className="text-xs">{snippet.stats.likes}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Eye className="w-3 h-3" />
-                <span className="text-xs">{snippet.views}</span>
+                <span className="text-xs">{snippet.stats.views}</span>
               </div>
             </div>
           </div>          {/* Action Buttons */}
@@ -242,7 +229,8 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
             >
               View Code
             </Link>
-          </div></div>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

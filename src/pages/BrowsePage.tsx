@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Search, Grid, List } from 'lucide-react';
 import SnippetCard from '../components/SnippetCard.tsx';
+import { snippetsData } from '../data/snippets';
 
 const BrowsePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -9,128 +10,7 @@ const BrowsePage = () => {
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  // Mock data - in a real app, this would come from an API
-  const allSnippets = [
-    {
-      id: '1',
-      title: 'Floating Orb Animation',
-      description: 'Beautiful CSS animation with floating particles and glowing effects that creates mesmerizing visuals',
-      category: 'css' as const,
-      tags: ['animation', 'css', 'particles', 'glow'],
-      author: { username: 'designmaster', displayName: 'Design Master', isVerified: true },
-      likes: 245,
-      views: 1250,
-      thumbnailUrl: '/api/placeholder/300/200'
-    },
-    {
-      id: '2', 
-      title: 'Interactive Button System',
-      description: 'Advanced hover effects with CSS transforms, transitions and dynamic JavaScript interactions',
-      category: 'javascript' as const,
-      tags: ['button', 'hover', 'transform', 'interaction'],
-      author: { username: 'jsdev', displayName: 'JS Developer', isVerified: false },
-      likes: 189,
-      views: 890
-    },
-    {
-      id: '3',
-      title: 'Canvas Particle Engine',
-      description: 'High-performance particle system using HTML5 Canvas with mouse interaction and physics',
-      category: 'canvas' as const,
-      tags: ['canvas', 'particles', 'physics', 'interactive'],
-      author: { username: 'canvasking', displayName: 'Canvas King', isVerified: true },
-      likes: 312,
-      views: 1580
-    },
-    {
-      id: '4',
-      title: 'Morphing Shape Loader',
-      description: 'CSS-only loading animation with smooth morphing shapes and color transitions',
-      category: 'animation' as const,
-      tags: ['loader', 'animation', 'morphing', 'css'],
-      author: { username: 'animatemaster', displayName: 'Animate Master', isVerified: true },
-      likes: 456,
-      views: 2340
-    },
-    {
-      id: '5',
-      title: 'WebGL Shader Effects',
-      description: 'Advanced WebGL shader effects with fragment shaders and real-time rendering',
-      category: 'webgl' as const,
-      tags: ['webgl', 'shader', 'effects', '3d'],
-      author: { username: 'gldev', displayName: 'GL Developer', isVerified: false },
-      likes: 178,
-      views: 756
-    },
-    {
-      id: '6',
-      title: 'Scroll-triggered Animations',
-      description: 'JavaScript animations that trigger on scroll events with smooth easing and performance optimization',
-      category: 'javascript' as const,
-      tags: ['scroll', 'animation', 'javascript', 'trigger'],
-      author: { username: 'scrollmaster', displayName: 'Scroll Master', isVerified: true },
-      likes: 234,
-      views: 1120
-    },
-    {
-      id: '7',
-      title: 'CSS Grid Masonry Layout',
-      description: 'Modern CSS Grid implementation of masonry layout with responsive breakpoints',
-      category: 'css' as const,
-      tags: ['grid', 'layout', 'responsive', 'masonry'],
-      author: { username: 'layoutpro', displayName: 'Layout Pro', isVerified: true, isPro: true },
-      likes: 567,
-      views: 2890    },
-    {
-      id: '8',
-      title: 'React State Management Demo',
-      description: 'Advanced React component demonstrating state management with beautiful animations',
-      category: 'react' as const,
-      tags: ['react', 'state', 'management', 'hooks'],
-      author: { username: 'reactguru', displayName: 'React Guru', isVerified: true, isPro: true },
-      likes: 389,
-      views: 1724
-    },
-    {
-      id: '9',
-      title: 'Vue.js Composition API',
-      description: 'Modern Vue component using Composition API with elegant transitions',
-      category: 'vue' as const,
-      tags: ['vue', 'composition', 'api', 'modern'],
-      author: { username: 'vuedev', displayName: 'Vue Developer', isVerified: true },
-      likes: 267,
-      views: 1342
-    },    {
-      id: '10',
-      title: '3D Card Flip Animation',
-      description: 'Stunning 3D card flip effect using CSS transforms and perspective',
-      category: 'animation' as const,
-      tags: ['3d', 'card', 'flip', 'transform'],
-      author: { username: '3dmaster', displayName: '3D Master', isVerified: true },
-      likes: 423,
-      views: 1950
-    },
-    {
-      id: '11',
-      title: 'Semantic HTML5 Structure',
-      description: 'Clean HTML5 markup with proper semantic elements and accessibility features',
-      category: 'html' as const,
-      tags: ['html5', 'semantic', 'accessibility', 'structure'],
-      author: { username: 'htmlpro', displayName: 'HTML Expert', isVerified: true },
-      likes: 156,
-      views: 789
-    },
-    {
-      id: '12',
-      title: 'WebGL Shader Effects',
-      description: 'Advanced WebGL shader effects with fragment shaders and real-time rendering',
-      category: 'webgl' as const,
-      tags: ['webgl', 'shader', 'effects', '3d'],
-      author: { username: 'gldev', displayName: 'GL Developer', isVerified: true, isPro: true },
-      likes: 298,
-      views: 1456
-    }
-  ];
+  const allSnippets = Object.values(snippetsData); // Centralized data
   const categories = [
     { id: 'all', label: 'All Categories' },
     { id: 'css', label: 'CSS' },
@@ -167,11 +47,11 @@ const BrowsePage = () => {
   const sortedSnippets = [...filteredSnippets].sort((a, b) => {
     switch (sortBy) {
       case 'popular':
-        return b.likes - a.likes;
+        return b.stats.likes - a.stats.likes;
       case 'views':
-        return b.views - a.views;
+        return b.stats.views - a.stats.views;
       case 'likes':
-        return b.likes - a.likes;
+        return b.stats.likes - a.stats.likes;
       default:
         return 0; // Recent would need timestamp
     }

@@ -6,6 +6,7 @@ import ThreeHero from '../components/ThreeHero.tsx';
 import SnippetCard from '../components/SnippetCard.tsx';
 import TagCloud from '../components/TagCloud.tsx';
 import { GSAPAnimations } from '../utils/GSAPAnimations';
+import { snippetsData } from '../data/snippets';
 
 const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -62,217 +63,9 @@ const HomePage = () => {
     animation: '✨'
   };
 
-  // Mock data for now
-  const featuredSnippets = [
-    {
-      id: '1',
-      title: 'Floating Orb Animation',
-      description: 'Mesmerizing CSS orb with floating particle trail effects',
-      category: 'css' as const,
-      tags: ['animation', 'css', 'particles', 'floating', 'orb'],
-      author: { username: 'designmaster', displayName: 'Design Master', isVerified: true, isPro: true },
-      likes: 245,
-      views: 1250,
-      code: `
-.floating-orb {
-  background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-  border-radius: 50%;
-  animation: float 3s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-}
+  // Use centralized snippet data
+  const featuredSnippets = Object.values(snippetsData);
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50% { transform: translateY(-15px) scale(1.1); }
-}
-      `.trim()
-    },
-    {
-      id: '2', 
-      title: 'Interactive Button Hover',
-      description: 'Smooth hover effects with CSS transforms and shadows',
-      category: 'javascript' as const,
-      tags: ['button', 'hover', 'transform', 'interactive'],
-      author: { username: 'jsmaster', displayName: 'JS Wizard', isVerified: true, isPro: false },
-      likes: 189,
-      views: 890,
-      code: `
-const button = document.querySelector('.hover-btn');
-button.addEventListener('mouseenter', () => {
-  button.style.transform = 'scale(1.05)';
-  button.style.boxShadow = '0 8px 25px rgba(251, 191, 36, 0.4)';
-});
-      `.trim()
-    },
-    {
-      id: '3',
-      title: 'Canvas Particle System',
-      description: 'Dynamic particle effects with glow and motion trails',
-      category: 'canvas' as const,
-      tags: ['canvas', 'particles', 'animation', 'webgl'],
-      author: { username: 'canvasking', displayName: 'Canvas King', isVerified: true, isPro: true },
-      likes: 312,
-      views: 1580,
-      code: `
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-const particles = [];
-
-function createParticle() {
-  return {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    vx: (Math.random() - 0.5) * 2,
-    vy: (Math.random() - 0.5) * 2,
-    life: 60
-  };
-}
-      `.trim()
-    },
-    {
-      id: '4',
-      title: 'Morphing Loader Animation',
-      description: 'Elegant CSS loader with smooth morphing transitions',
-      category: 'animation' as const,
-      tags: ['loader', 'morphing', 'css', 'spinner'],
-      author: { username: 'animatrix', displayName: 'Animatrix Pro', isVerified: true, isPro: true },
-      likes: 178,
-      views: 967,
-      code: `
-.morphing-loader {
-  border: 2px solid #00ff88;
-  border-radius: 8px;
-  animation: morph 4s infinite linear;
-}
-
-@keyframes morph {
-  0% { border-radius: 8px; transform: rotate(0deg); }
-  25% { border-radius: 50%; }
-  50% { border-radius: 8px; transform: rotate(180deg); }
-  75% { border-radius: 50%; }
-  100% { border-radius: 8px; transform: rotate(360deg); }
-}
-      `.trim()    },
-    {
-      id: '5',
-      title: 'React Component Animation',
-      description: 'Beautiful React component with state transitions and hooks',
-      category: 'react' as const,
-      tags: ['react', 'hooks', 'animation', 'component'],
-      author: { username: 'reactpro', displayName: 'React Master', isVerified: true, isPro: true },
-      likes: 298,
-      views: 1456,
-      code: `
-const AnimatedComponent = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  return (
-    <motion.div
-      animate={{ scale: isVisible ? 1 : 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <h1>Hello React!</h1>
-    </motion.div>
-  );
-};
-      `.trim()
-    },
-    {
-      id: '6',
-      title: 'Vue.js Progressive Animation',
-      description: 'Elegant Vue component with progressive reveal animations',
-      category: 'vue' as const,
-      tags: ['vue', 'progressive', 'animation', 'transition'],
-      author: { username: 'vuemaster', displayName: 'Vue Expert', isVerified: true, isPro: false },
-      likes: 234,
-      views: 1123,
-      code: `
-<template>
-  <transition name="slide-fade">
-    <div v-if="show" class="animated-box">
-      <h1>Vue Animation</h1>
-    </div>
-  </transition>
-</template>
-
-<style>
-.slide-fade-enter-active {
-  transition: all 0.6s ease;
-}
-</style>
-      `.trim()
-    },
-    {
-      id: '7',
-      title: 'Gooey Navigation Menu',
-      description: 'Liquid morphing navigation with SVG path animations',
-      category: 'css' as const,
-      tags: ['navigation', 'gooey', 'svg', 'morphing'],
-      author: { username: 'liquidui', displayName: 'Liquid UI', isVerified: false, isPro: true },
-      likes: 423,
-      views: 2100,
-      code: `
-.gooey-menu {
-  filter: url('#gooey');
-}
-
-.menu-item {
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border-radius: 50px;
-}      `.trim()
-    },
-    {
-      id: '8',
-      title: 'Semantic HTML5 Structure',
-      description: 'Modern HTML5 semantic elements with accessibility features',
-      category: 'html' as const,
-      tags: ['html5', 'semantic', 'accessibility', 'structure'],
-      author: { username: 'htmlpro', displayName: 'HTML Expert', isVerified: true, isPro: false },
-      likes: 167,
-      views: 823,
-      code: `
-<article role="main">
-  <header>
-    <h1>Article Title</h1>
-    <time datetime="2025-06-01">June 1, 2025</time>
-  </header>
-  <section>
-    <p>Content goes here...</p>
-  </section>
-  <aside aria-label="Related links">
-    <nav>
-      <ul>
-        <li><a href="#related">Related Article</a></li>
-      </ul>
-    </nav>
-  </aside>
-</article>
-      `.trim()
-    },
-    {
-      id: '9',
-      title: '3D WebGL Cube Renderer',
-      description: 'Interactive 3D cube with WebGL shaders and real-time rotation',
-      category: 'webgl' as const,
-      tags: ['webgl', '3d', 'shaders', 'cube', 'interactive'],
-      author: { username: 'glmaster', displayName: 'WebGL Pro', isVerified: true, isPro: true },
-      likes: 389,
-      views: 1987,
-      code: `
-const gl = canvas.getContext('webgl');
-const vertices = [
-  -1, -1,  1,   1, -1,  1,   1,  1,  1,  -1,  1,  1,
-  -1, -1, -1,  -1,  1, -1,   1,  1, -1,   1, -1, -1
-];
-
-function drawCube() {
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.useProgram(shaderProgram);
-  gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-}
-      `.trim()
-    }
-  ];
   const stats = [
     { icon: Code, label: 'Snippets', value: '12,547', subtitle: 'Interactive treasures' },
     { icon: Users, label: 'Creators', value: '3,892', subtitle: 'Creative coders' },
@@ -452,9 +245,9 @@ function drawCube() {
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center space-x-2 text-gray-400">
                         <Heart className="w-4 h-4" />
-                        <span>{snippet.likes}</span>
+                        <span>{snippet.stats.likes}</span>
                         <Eye className="w-4 h-4 ml-2" />
-                        <span>{snippet.views}</span>
+                        <span>{snippet.stats.views}</span>
                       </div>                      <span 
                         className={`px-2 py-1 rounded-md text-xs font-medium ${
                           categoryColors[snippet.category as keyof typeof categoryColors] || 
