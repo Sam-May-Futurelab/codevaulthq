@@ -1,4 +1,4 @@
-import { Heart, Eye, Download, ExternalLink, User, CheckCircle } from 'lucide-react';
+import { Heart, Eye, ExternalLink, User, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import LivePreview from './LivePreview';
@@ -144,15 +144,19 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
       >        {/* Title and Description - Top section */}
         <div className="flex-shrink-0">          <Link
             to={`/snippet/${snippet.id}`}
-            className="text-lg font-semibold text-white hover:text-white/80 transition-colors line-clamp-1 leading-tight block"
+            className="text-lg font-semibold line-clamp-1 leading-tight block"
+            data-testid="snippet-title-link"
             style={{ 
-              color: '#ffffff !important' 
+              color: '#ffffff !important',
+              textDecoration: 'none !important'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8) !important';
+              e.currentTarget.style.textDecoration = 'none !important';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = '#ffffff !important';
+              e.currentTarget.style.textDecoration = 'none !important';
             }}
           >
             {snippet.title}
@@ -230,20 +234,15 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
                 <span className="text-xs">{snippet.views}</span>
               </div>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          </div>          {/* Action Buttons */}
+          <div className="mt-4 pt-2">
             <Link
               to={`/snippet/${snippet.id}`}
-              className="flex-1 bg-vault-accent hover:bg-vault-accent/80 text-black py-2 px-3 rounded-lg text-sm font-medium transition-colors text-center"
+              className="w-full bg-vault-accent hover:bg-vault-accent/80 text-black py-2.5 px-4 rounded-lg text-sm font-medium transition-colors text-center block"
             >
               View Code
             </Link>
-            <button className="bg-vault-light hover:bg-vault-light/80 text-white p-2 rounded-lg transition-colors">
-              <Download className="w-4 h-4" />
-            </button>
-          </div>        </div>
+          </div></div>
       </div>
     </motion.div>
   );

@@ -1,7 +1,20 @@
-/* Custom styles for Code Vault HQ */
-
 /* Import Google Fonts for sci-fi feel */
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
+
+/* Custom styles for Code Vault HQ */
+
+/* Force snippet title links to be white */
+a[data-testid="snippet-title-link"],
+a[href*="/snippet/"] {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+a[data-testid="snippet-title-link"]:hover,
+a[href*="/snippet/"]:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-decoration: none !important;
+}
 
 /* Glow effects */
 .glow-green {
