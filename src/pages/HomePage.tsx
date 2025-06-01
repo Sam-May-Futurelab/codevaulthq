@@ -1,21 +1,58 @@
 import { motion } from 'framer-motion';
 import { Code, Users, Download, Star, Heart, Eye, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ThreeHero from '../components/ThreeHero.tsx';
 import SnippetCard from '../components/SnippetCard.tsx';
 import TagCloud from '../components/TagCloud.tsx';
 import { GSAPAnimations } from '../utils/GSAPAnimations';
-import { useTopRankedSnippets, useTrendingSnippets, usePlatformStats } from '../hooks/useSnippetData';
+import { useTopRankedSnippets, useTrendingSnippets } from '../hooks/useFirebaseData';
+import { usePlatformStats } from '../hooks/useSnippetData';
+import { snippetsData } from '../data/snippets';
+import DataSeeder from '../services/DataSeeder';
 
 const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
+  const [isSeeding, setIsSeeding] = useState(false);
+  
+  // Use Firebase hooks for real-time data
+  const { snippets: topSnippets, loading: loadingTop, error: errorTop } = useTopRankedSnippets(10);
+  const { snippets: trendingSnippets, loading: loadingTrending, error: errorTrending } = useTrendingSnippets(6);
+  const { stats: platformStats, loading: loadingStats, error: errorStats } = usePlatformStats();
+  
+  // Debug Firebase connection
+  console.log('Firebase Connection Debug:', {
+    topSnippets: topSnippets.length,
+    loadingTop,
+    errorTop,
+    trendingSnippets: trendingSnippets.length,
+    loadingTrending,
+    errorTrending,
+    platformStats,
+    loadingStats,
+    errorStats
+  });
+  
+  // Fallback to mock data if Firebase data is empty
+  const mockSnippetsArray = Object.values(snippetsData);
+  const displayTrendingSnippets = trendingSnippets.length > 0 ? trendingSnippets : mockSnippetsArray.slice(0, 6);
+  const displayTopSnippets = topSnippets.length > 0 ? topSnippets : mockSnippetsArray.slice(0, 10);
 
-  // Use dynamic hooks for real data
-  const { snippets: topSnippets, loading: loadingTop } = useTopRankedSnippets(10);
-  const { snippets: trendingSnippets, loading: loadingTrending } = useTrendingSnippets(6, 'day');
-  const { stats: platformStats, loading: loadingStats } = usePlatformStats();
+  const seedDatabase = async () => {
+    if (isSeeding) return;
+    
+    setIsSeeding(true);
+    try {
+      await DataSeeder.seedDatabase();
+      // Refresh the page to show new data
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to seed database:', error);
+    } finally {
+      setIsSeeding(false);
+    }
+  };
 
   useEffect(() => {
     // Initialize GSAP animations
@@ -55,6 +92,23 @@ const HomePage = () => {
       cleanupFunctions.forEach(cleanup => cleanup());
     };
   }, [platformStats, loadingStats]);
+
+  // Helper to get likes/views for all snippet types
+const getLikes = (snippet: any) => {
+  if (snippet.metrics) return snippet.metrics.likes;
+  if (snippet.analytics && snippet.analytics.likes !== undefined) return snippet.analytics.likes;
+  if (snippet.analytics && snippet.analytics.metrics) return snippet.analytics.metrics.likes;
+  return snippet.likes || 0;
+};
+const getViews = (snippet: any) => {
+  if (snippet.metrics) return snippet.metrics.views;
+  if (snippet.analytics && snippet.analytics.views !== undefined) return snippet.analytics.views;
+  if (snippet.analytics && snippet.analytics.metrics) return snippet.analytics.metrics.views;
+  return snippet.views || 0;
+};
+const getCategory = (snippet: any) => {
+  return snippet.category || snippet.language || 'javascript';
+};
 
   // Category colors for consistency
   const categoryColors = {
@@ -189,7 +243,7 @@ const HomePage = () => {
         <section ref={statsRef} className="stats-section py-32 bg-gradient-to-br from-vault-dark via-vault-medium to-vault-dark border-y border-vault-accent/20 my-24">
           <div className="px-6 sm:px-8 lg:px-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-              {stats.map((stat, index) => (
+              {stats.map((stat: any, index: number) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 30 }}
@@ -227,15 +281,22 @@ const HomePage = () => {
               <p className="text-sm text-vault-accent font-code">
                 ✨ Curated by creative coders across the cosmos
               </p>
-            </motion.div>
-
-            {loadingTrending ? (
+            </motion.div>            {loadingTrending ? (
               <div className="text-center py-12">
                 <div className="text-vault-accent text-lg">Loading trending snippets...</div>
+                {import.meta.env.DEV && (
+                  <button
+                    onClick={seedDatabase}
+                    disabled={isSeeding}
+                    className="mt-4 px-6 py-2 bg-vault-accent text-black rounded-lg font-bold hover:bg-vault-accent/80 transition-colors disabled:opacity-50"
+                  >
+                    {isSeeding ? 'Seeding Database...' : 'Seed Sample Data'}
+                  </button>
+                )}
               </div>
             ) : (
               <div className="snippet-grid">
-                {trendingSnippets.map((snippet, index) => (
+                {displayTrendingSnippets.map((snippet, index) => (
                   <motion.div
                     key={snippet.id}
                     initial={{ opacity: 0, y: 30 }}
@@ -286,21 +347,20 @@ const HomePage = () => {
             </motion.div>
 
             {/* Horizontal Scroll Container */}
-            <div className="relative">
-              {loadingTop ? (
+            <div className="relative">              {loadingTop ? (
                 <div className="text-center py-12">
                   <div className="text-vault-purple text-lg">Loading top snippets...</div>
                 </div>
               ) : (
                 <div className="flex overflow-x-auto pb-6 scrollbar-thin scrollbar-track-vault-dark scrollbar-thumb-vault-accent/50" style={{paddingLeft: '24px', paddingRight: '24px'}}>
-                  {topSnippets.map((snippet, index) => (
+                  {displayTopSnippets.map((snippet: any, index: number) => (
                     <motion.div
                       key={`top10-${snippet.id}-${index}`}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                       className="flex-shrink-0 w-80 top10-item"
-                      style={{marginRight: index < topSnippets.length - 1 ? '24px' : '0'}}
+                      style={{marginRight: index < displayTopSnippets.length - 1 ? '24px' : '0'}}
                     >
                       <div className="interactive-card relative bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-4 hover:border-vault-purple/50 transition-all duration-300 group">
                         <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-vault-purple to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -320,16 +380,16 @@ const HomePage = () => {
                           <div className="flex items-center space-x-2 text-gray-400">
                             <Heart className="w-4 h-4" />
                             <span>
-                              {snippet.analytics.metrics.likes}
+                              {getLikes(snippet)}
                             </span>
                             <Eye className="w-4 h-4 ml-2" />
                             <span>
-                              {snippet.analytics.metrics.views}
+                              {getViews(snippet)}
                             </span>
                           </div>
                           <span 
                             className={`px-2 py-1 rounded-md text-xs font-medium ${
-                              categoryColors[snippet.category as keyof typeof categoryColors] || 
+                              categoryColors[getCategory(snippet) as keyof typeof categoryColors] || 
                               'bg-gray-500/20 text-gray-300 border-gray-400/30'
                             }`}
                             style={{
@@ -340,9 +400,9 @@ const HomePage = () => {
                             }}
                           >
                             <span className="mr-1">
-                              {categoryIcons[snippet.category as keyof typeof categoryIcons] || '📄'}
+                              {categoryIcons[getCategory(snippet) as keyof typeof categoryIcons] || '📄'}
                             </span>
-                            {snippet.category.toUpperCase()}
+                            {getCategory(snippet).toUpperCase()}
                           </span>
                         </div>
                       </div>
@@ -404,14 +464,13 @@ const HomePage = () => {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
                   className="trending-tag interactive-card bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-8 text-center hover:border-vault-accent/50 transition-all duration-300 cursor-pointer group"
-                >
-                  <div className="text-2xl font-bold text-white mb-2 font-mono">{Math.floor(Math.random() * 1000)}</div>
+                >                  <div className="text-2xl font-bold text-white mb-2 font-mono">42</div>
                   <div className="text-sm text-gray-300 mb-3">{tag}</div>
-                  <div className="text-xs text-vault-accent font-semibold">{`+${Math.floor(Math.random() * 30)}%`}</div>
+                  <div className="text-xs text-vault-accent font-semibold">+12%</div>
                   <div className="mt-3 h-1 bg-vault-dark rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      whileInView={{ width: `${Math.random() * 60 + 40}%` }}
+                      whileInView={{ width: "65%" }}
                       transition={{ duration: 1, delay: index * 0.1 }}
                       className="h-full bg-gradient-to-r from-vault-accent to-vault-purple rounded-full"
                     />
@@ -421,6 +480,39 @@ const HomePage = () => {
             </div>
           </div>
         </section>
+
+        {/* Development Database Controls */}
+        {import.meta.env.DEV && (
+          <div className="text-center mt-8 p-4 bg-vault-medium/20 rounded-lg border border-vault-light/20">
+            <p className="text-gray-400 text-sm mb-3">Development Tools</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={seedDatabase}
+                disabled={isSeeding}
+                className="px-4 py-2 bg-vault-accent text-black rounded-lg font-bold hover:bg-vault-accent/80 transition-colors disabled:opacity-50"
+              >
+                {isSeeding ? 'Seeding...' : 'Seed Firebase Data'}
+              </button>
+              <button
+                onClick={() => {
+                  console.log('Firebase Debug Info:', {
+                    topSnippets: topSnippets.length,
+                    trendingSnippets: trendingSnippets.length,
+                    errors: { errorTop, errorTrending, errorStats }
+                  });
+                }}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg font-bold hover:bg-gray-500 transition-colors"
+              >
+                Debug Firebase
+              </button>
+            </div>
+            {(errorTop || errorTrending || errorStats) && (
+              <div className="mt-3 text-red-400 text-xs">
+                <p>Errors: {errorTop || errorTrending || errorStats}</p>
+              </div>
+            )}
+          </div>
+        )}
         
       </div>
     </>

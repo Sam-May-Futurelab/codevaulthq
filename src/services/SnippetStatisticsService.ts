@@ -59,9 +59,8 @@ class SnippetStatisticsService {
   private analyticsData: Map<string, SnippetAnalytics> = new Map();
   private updateQueue: Set<string> = new Set();
   private isUpdating: boolean = false;
-
   private constructor() {
-    // Initialize with mock data for demo
+    // Initialize with actual snippet data
     this.initializeMockData();
     
     // Start periodic updates
@@ -402,32 +401,69 @@ class SnippetStatisticsService {
       }
     }, 24 * 60 * 60 * 1000);
   }
+  private async initializeMockData(): Promise<void> {
+    // Initialize with actual snippet data instead of random mock data
+    try {
+      const { snippetsData } = await import('../data/snippets');
+      
+      Object.entries(snippetsData).forEach(([id, snippet]) => {
+        const analytics = this.createDefaultAnalytics(id);
+        
+        // Use actual stats from snippet data
+        analytics.metrics.views = snippet.stats.views;
+        analytics.metrics.likes = snippet.stats.likes;
+        analytics.metrics.downloads = snippet.stats.downloads;
+        analytics.metrics.comments = snippet.stats.comments;
+        
+        // Set reasonable derived stats based on actual data
+        analytics.metrics.shares = Math.floor(snippet.stats.likes * 0.1); // 10% of likes get shared
+        analytics.metrics.bookmarks = Math.floor(snippet.stats.likes * 0.3); // 30% of likes get bookmarked
+        analytics.metrics.forks = Math.floor(snippet.stats.downloads * 0.2); // 20% of downloads get forked
+        
+        // Time-based views (distribute total views across timeframes)
+        analytics.metrics.dailyViews = Math.floor(snippet.stats.views * 0.05); // 5% daily
+        analytics.metrics.weeklyViews = Math.floor(snippet.stats.views * 0.2); // 20% weekly
+        analytics.metrics.monthlyViews = Math.floor(snippet.stats.views * 0.6); // 60% monthly
+        
+        // Calculate engagement metrics based on actual data
+        analytics.metrics.averageTimeSpent = 30 + (snippet.stats.likes / snippet.stats.views) * 120; // 30-150 seconds
+        analytics.metrics.bounceRate = Math.max(0.1, 1 - (snippet.stats.likes / snippet.stats.views)); // Lower bounce for popular snippets
+        analytics.metrics.interactionRate = (snippet.stats.likes + snippet.stats.comments + snippet.stats.downloads) / snippet.stats.views;
+        analytics.metrics.communityScore = snippet.stats.likes + (snippet.stats.comments * 2) + (snippet.stats.downloads * 0.5);
+        
+        // Set ranking factors based on actual performance
+        const totalEngagement = snippet.stats.likes + snippet.stats.comments + snippet.stats.downloads;
+        const engagementRate = totalEngagement / snippet.stats.views;
+        
+        analytics.ranking.engagement = Math.min(1, engagementRate * 5); // Scale engagement rate
+        analytics.ranking.quality = Math.min(1, snippet.stats.likes / 100); // Quality based on likes
+        analytics.ranking.creativity = Math.min(1, snippet.tags.length / 10); // More tags = more creative
+        analytics.ranking.popularity = Math.min(1, snippet.stats.views / 1000); // Popularity based on views
+        analytics.ranking.authorReputation = snippet.author.isVerified ? 0.8 : 0.5; // Verified authors get higher rep
+        
+        // Recency based on snippet ID (lower ID = older, higher recency for newer)
+        const numericId = parseInt(id);
+        const maxId = Math.max(...Object.keys(snippetsData).map(k => parseInt(k)));
+        analytics.ranking.recency = numericId / maxId;
+        
+        this.calculateEngagementRate(analytics);
+        this.analyticsData.set(id, analytics);
+      });
+      
+      console.log(`Initialized analytics for ${Object.keys(snippetsData).length} snippets with actual data`);
+    } catch (error) {
+      console.error('Failed to initialize analytics with actual data:', error);
+      // Fallback to basic initialization
+      this.initializeFallbackData();
+    }
+  }
 
-  private initializeMockData(): void {
-    // Initialize with some mock data for demo purposes
+  private initializeFallbackData(): void {
+    // Fallback initialization with minimal mock data
     const mockSnippetIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
     
-    mockSnippetIds.forEach((id, index) => {
+    mockSnippetIds.forEach((id) => {
       const analytics = this.createDefaultAnalytics(id);
-      
-      // Add some realistic mock data
-      analytics.metrics.views = Math.floor(Math.random() * 5000) + 100;
-      analytics.metrics.likes = Math.floor(Math.random() * 500) + 10;
-      analytics.metrics.downloads = Math.floor(Math.random() * 200) + 5;
-      analytics.metrics.shares = Math.floor(Math.random() * 50) + 1;
-      analytics.metrics.comments = Math.floor(Math.random() * 20) + 1;
-      analytics.metrics.dailyViews = Math.floor(Math.random() * 100) + 10;
-      analytics.metrics.weeklyViews = Math.floor(Math.random() * 500) + 50;
-      analytics.metrics.monthlyViews = Math.floor(Math.random() * 2000) + 200;
-      
-      analytics.ranking.engagement = Math.random();
-      analytics.ranking.quality = Math.random();
-      analytics.ranking.creativity = Math.random();
-      analytics.ranking.popularity = Math.random();
-      analytics.ranking.authorReputation = Math.random();
-      analytics.ranking.recency = Math.max(0, 1 - (index * 0.1)); // Newer ones get higher recency
-      
-      this.calculateEngagementRate(analytics);
       this.analyticsData.set(id, analytics);
     });
   }

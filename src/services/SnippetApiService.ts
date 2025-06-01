@@ -303,12 +303,13 @@ class SnippetApiService {
         totalViews += analytics.metrics.views;
         totalLikes += analytics.metrics.likes;
         totalDownloads += analytics.metrics.downloads;
-      }
-
-      // Count categories
+      }      // Count categories and unique authors
       for (const snippet of Object.values(snippetsData)) {
         categoryCount[snippet.category] = (categoryCount[snippet.category] || 0) + 1;
       }
+
+      // Get unique authors count for accurate activeUsers
+      const uniqueAuthors = new Set(Object.values(snippetsData).map(snippet => snippet.author.username)).size;
 
       const topCategories = Object.entries(categoryCount)
         .map(([category, count]) => ({ category, count }))
@@ -319,7 +320,7 @@ class SnippetApiService {
         totalViews,
         totalLikes,
         totalDownloads,
-        activeUsers: Math.floor(totalViews / 10), // Rough estimate
+        activeUsers: uniqueAuthors, // Use actual count of unique authors
         topCategories
       };
 
@@ -330,6 +331,13 @@ class SnippetApiService {
       console.error('Failed to fetch platform stats:', error);
       throw new Error('Unable to fetch platform statistics');
     }
+  }
+
+  /**
+   * Clear all cached data - useful for forcing fresh data calculations
+   */
+  public clearCache(): void {
+    this.cache.clear();
   }
 
   // Private helper methods

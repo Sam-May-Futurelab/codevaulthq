@@ -4,37 +4,61 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import LiveCodePreviewSimple from './LiveCodePreviewSimple';
 import AudioFeedback from '../utils/AudioFeedback';
-import { useSnippetInteraction } from '../hooks/useSnippetData';
+import { useSnippetInteraction } from '../hooks/useFirebaseData';
 import type { SnippetData } from '../data/snippets';
 import type { SnippetWithAnalytics } from '../services/SnippetApiService';
+import type { SnippetWithMetrics } from '../types';
 
 interface SnippetCardProps {
-  snippet: SnippetData | SnippetWithAnalytics;
+  snippet: SnippetData | SnippetWithAnalytics | SnippetWithMetrics;
 }
 
 const SnippetCard = ({ snippet }: SnippetCardProps) => {
   const audio = AudioFeedback.getInstance();
-  const { trackView, trackLike, trackDownload } = useSnippetInteraction();
+  const { trackInteraction } = useSnippetInteraction(snippet.id);
   const [isLiked, setIsLiked] = useState(false);
-  const [localStats, setLocalStats] = useState(snippet.stats);
+  
+  // Helper function to get snippet properties with fallbacks
+  const getSnippetProperty = (prop: string): any => {
+    return (snippet as any)[prop];
+  };
+
+  // Get current stats with proper fallbacks
+  const getCurrentStats = () => {
+    // Check if snippet has analytics property
+    if ('analytics' in snippet && snippet.analytics) {
+      const analytics = snippet.analytics as any;
+      return {
+        likes: analytics.likes || 0,
+        views: analytics.views || 0,
+        downloads: analytics.downloads || 0,
+        comments: analytics.comments || 0
+      };
+    }
+    // Check if snippet has stats property
+    if ('stats' in snippet && snippet.stats) {
+      return snippet.stats;
+    }
+    // Check if snippet has metrics property
+    if ('metrics' in snippet && snippet.metrics) {
+      return snippet.metrics;
+    }
+    // Fallback for basic snippet types
+    return {
+      likes: getSnippetProperty('likes') || 0,
+      views: getSnippetProperty('views') || 0,
+      downloads: getSnippetProperty('downloads') || 0,
+      comments: getSnippetProperty('comments') || 0
+    };
+  };
+
+  const [localStats, setLocalStats] = useState(getCurrentStats());
 
   // Track view when component mounts
   useEffect(() => {
-    trackView(snippet.id);
-  }, [snippet.id, trackView]);
+    trackInteraction('view');
+  }, [snippet.id, trackInteraction]);
 
-  // Helper function to check if snippet has analytics data
-  const hasAnalytics = (s: SnippetData | SnippetWithAnalytics): s is SnippetWithAnalytics => {
-    return 'analytics' in s;
-  };
-
-  // Get current stats - use analytics if available, fallback to basic stats
-  const currentStats = hasAnalytics(snippet) ? {
-    likes: snippet.analytics.metrics.likes,
-    views: snippet.analytics.metrics.views,
-    downloads: snippet.analytics.metrics.downloads,
-    comments: snippet.analytics.metrics.comments
-  } : localStats;
   // Handle like interaction
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,7 +66,7 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
     audio.playClick();
     
     try {
-      await trackLike(snippet.id);
+      await trackInteraction('like');
       setIsLiked(!isLiked);
       setLocalStats(prev => ({
         ...prev,
@@ -52,14 +76,61 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
       console.warn('Failed to track like:', error);
     }
   };
+
   // Handle download tracking when viewing code
   const handleViewCode = async () => {
     try {
-      await trackDownload(snippet.id);
+      await trackInteraction('download');
     } catch (error) {
       console.warn('Failed to track download:', error);
     }
   };
+
+  // Get code object with fallbacks
+  const getCodeObject = () => {
+    const code = getSnippetProperty('code');
+    if (typeof code === 'string') {
+      // If code is a string, try to parse it as HTML/CSS/JS
+      return {
+        html: code.includes('<') ? code : '',
+        css: code.includes('{') && code.includes(':') ? code : '',
+        javascript: code.includes('function') || code.includes('=>') || code.includes('var') || code.includes('let') || code.includes('const') ? code : ''
+      };
+    }
+    return code || { html: '', css: '', javascript: '' };
+  };
+
+  // Get author info with fallbacks
+  const getAuthorInfo = () => {
+    const author = getSnippetProperty('author');
+    if (author) {
+      return author;
+    }
+    // Fallback for Firebase snippets
+    return {
+      username: getSnippetProperty('authorName') || 'Anonymous',
+      displayName: getSnippetProperty('authorName') || 'Anonymous',
+      isVerified: false,
+      isPro: false
+    };
+  };
+
+  // Get category with fallback
+  const getCategory = () => {
+    return getSnippetProperty('category') || getSnippetProperty('language') || 'javascript';
+  };
+
+  // Get thumbnail URL with fallback
+  const getThumbnailUrl = () => {
+    return getSnippetProperty('thumbnailUrl') || null;
+  };
+
+  const codeObj = getCodeObject();
+  const author = getAuthorInfo();
+  const category = getCategory();
+  const currentStats = localStats;
+  const thumbnailUrl = getThumbnailUrl();
+
   const categoryColors = {
     css: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
     javascript: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
@@ -80,16 +151,18 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
     react: '⚛️',
     vue: '💚',
     animation: '✨'
-  };  return (
+  };
+
+  return (
     <motion.div
-      // Removed whileHover and onHoverStart to prevent interference with snippet interactions
       className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-none flex flex-col"
       style={{ 
         height: '480px', 
         minHeight: '480px', 
         maxHeight: '480px' 
       }}
-    >{/* DEDICATED LIVE PREVIEW SECTION - Exactly 260px height */}
+    >
+      {/* DEDICATED LIVE PREVIEW SECTION - Exactly 260px height */}
       <div 
         className="relative bg-gradient-to-br from-vault-dark to-vault-medium overflow-hidden flex-shrink-0"
         style={{ 
@@ -98,24 +171,28 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
           maxHeight: '260px' 
         }}
       >
-        {snippet.thumbnailUrl ? (
+        {thumbnailUrl ? (
           <img
-            src={snippet.thumbnailUrl}
+            src={thumbnailUrl}
             alt={snippet.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full relative">            {/* Live Preview - Fill entire dedicated section */}
+          <div className="w-full h-full relative">
+            {/* Live Preview - Fill entire dedicated section */}
             <div className="w-full h-full">
               <LiveCodePreviewSimple 
-                html={snippet.code.html}
-                css={snippet.code.css}
-                javascript={snippet.code.javascript}
-                className="w-full h-full"            />
+                html={codeObj.html}
+                css={codeObj.css}
+                javascript={codeObj.javascript}
+                className="w-full h-full"
+              />
             </div>
           </div>
-        )}{/* Category Badge - Positioned bottom-right of preview for better visibility */}
-        <div 
+        )}
+
+        {/* Category Badge - Positioned bottom-right of preview for better visibility */}
+        <div
           className="absolute bottom-3 right-3 z-20" 
           style={{ 
             position: 'absolute',
@@ -123,9 +200,10 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
             right: '12px', 
             zIndex: '999' 
           }}
-        >          <span 
+        >
+          <span 
             className={`px-3 py-2 rounded-lg text-xs font-bold border shadow-lg backdrop-blur-sm ${
-              categoryColors[snippet.category as keyof typeof categoryColors] || 
+              categoryColors[category as keyof typeof categoryColors] || 
               'bg-gray-500/20 text-gray-300 border-gray-400/30'
             }`}
             style={{
@@ -140,11 +218,13 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
             }}
           >
             <span className="mr-1">
-              {categoryIcons[snippet.category as keyof typeof categoryIcons] || '📄'}
+              {categoryIcons[category as keyof typeof categoryIcons] || '📄'}
             </span>
-            {snippet.category.toUpperCase()}
+            {category.toUpperCase()}
           </span>
-        </div>        {/* Like Button */}
+        </div>
+
+        {/* Like Button */}
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
             onClick={handleLike}
@@ -154,7 +234,10 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
           >
             <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
           </button>
-        </div></div>      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}
+        </div>
+      </div>
+
+      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}
       <div 
         className="p-4 flex flex-col justify-between flex-shrink-0"
         style={{ 
@@ -162,8 +245,10 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
           minHeight: '220px', 
           maxHeight: '220px' 
         }}
-      >        {/* Title and Description - Top section */}
-        <div className="flex-shrink-0">          <Link
+      >
+        {/* Title and Description - Top section */}
+        <div className="flex-shrink-0">
+          <Link
             to={`/snippet/${snippet.id}`}
             className="text-lg font-semibold line-clamp-1 leading-tight block"
             data-testid="snippet-title-link"
@@ -185,7 +270,9 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
           <p className="text-gray-400 text-sm mt-2 line-clamp-2 leading-relaxed">
             {snippet.description}
           </p>
-        </div>        {/* Middle section - Tags */}
+        </div>
+
+        {/* Middle section - Tags */}
         <div 
           className="flex flex-wrap gap-2 my-4"
           style={{
@@ -225,7 +312,7 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
           {/* Author and Stats Row */}
           <div className="flex items-center justify-between mb-3">
             <Link
-              to={`/profile/${snippet.author.username}`}
+              to={`/profile/${author.username}`}
               className="flex items-center space-x-2 group/author"
             >
               <div className="w-6 h-6 bg-gradient-to-br from-vault-accent to-vault-purple rounded-full flex items-center justify-center">
@@ -233,16 +320,18 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
               </div>
               <div className="flex items-center space-x-1">
                 <span className="text-gray-300 group-hover/author:text-white transition-colors text-sm">
-                  {snippet.author.displayName}
+                  {author.displayName}
                 </span>
-                {snippet.author.isVerified && (
+                {author.isVerified && (
                   <CheckCircle className="w-3 h-3 text-vault-accent" />
                 )}
-                {snippet.author.isPro && (
+                {author.isPro && (
                   <span className="text-xs">✨</span>
                 )}
               </div>
-            </Link>            {/* Stats */}
+            </Link>
+
+            {/* Stats */}
             <div className="flex items-center space-x-3 text-gray-400">
               <div className="flex items-center space-x-1">
                 <Heart className="w-3 h-3" />
@@ -253,7 +342,9 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
                 <span className="text-xs">{currentStats.views}</span>
               </div>
             </div>
-          </div>          {/* Action Buttons */}
+          </div>
+
+          {/* Action Buttons */}
           <div className="mt-4 pt-2">
             <Link
               to={`/snippet/${snippet.id}`}

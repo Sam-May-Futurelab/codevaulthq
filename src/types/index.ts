@@ -85,3 +85,73 @@ export interface UploadSnippetData {
   isPublic: boolean;
   license: Snippet['license'];
 }
+
+// Firebase-compatible snippet interface
+export interface FirebaseSnippet {
+  id?: string; // Make optional to match Firestore
+  title: string;
+  description: string;
+  code: string; // Firebase stores as single string
+  language: string;
+  tags: string[];
+  authorId: string;
+  authorName: string;
+  isPublic: boolean;
+  createdAt: any; // Firebase Timestamp
+  updatedAt: any; // Firebase Timestamp
+  analytics: {
+    views: number;
+    likes: number;
+    downloads: number;
+    shares: number;
+    bookmarks: number;
+    forks: number;
+    comments: number;
+    engagementRate: number;
+  };
+}
+
+// Extended snippet with computed metrics for compatibility
+export interface SnippetWithMetrics extends Omit<FirebaseSnippet, 'id'> {
+  id: string; // Required for display components
+  metrics: {
+    views: number;
+    likes: number;
+    downloads: number;
+    comments: number;
+    shares: number;
+  };
+  rankingScore?: number;
+  trendingScore?: number;
+  stats?: {
+    views: number;
+    likes: number;
+    downloads: number;
+    comments: number;
+    engagementRate: number;
+  };
+}
+
+// Helper function to convert Firebase snippet to component-compatible format
+export const convertFirebaseSnippet = (firebaseSnippet: FirebaseSnippet): SnippetWithMetrics => {
+  return {
+    ...firebaseSnippet,
+    id: firebaseSnippet.id || '', // Ensure id is string
+    metrics: {
+      views: firebaseSnippet.analytics.views,
+      likes: firebaseSnippet.analytics.likes,
+      downloads: firebaseSnippet.analytics.downloads,
+      comments: firebaseSnippet.analytics.comments,
+      shares: firebaseSnippet.analytics.shares,
+    },
+    stats: {
+      views: firebaseSnippet.analytics.views,
+      likes: firebaseSnippet.analytics.likes,
+      downloads: firebaseSnippet.analytics.downloads,
+      comments: firebaseSnippet.analytics.comments,
+      engagementRate: firebaseSnippet.analytics.engagementRate,
+    },
+    rankingScore: firebaseSnippet.analytics.engagementRate,
+    trendingScore: firebaseSnippet.analytics.engagementRate,
+  };
+};
