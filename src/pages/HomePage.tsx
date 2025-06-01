@@ -40,18 +40,26 @@ const HomePage = () => {
 
     return () => {
       cleanupFunctions.forEach(cleanup => cleanup());
-    };  }, []);
-
-  // Category colors for consistency
+    };  }, []);  // Category colors for consistency
   const categoryColors = {
-    css: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    javascript: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    html: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-    canvas: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    webgl: 'bg-green-500/20 text-green-400 border-green-500/30',
-    react: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-    vue: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    animation: 'bg-pink-500/20 text-pink-400 border-pink-500/30'
+    css: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
+    javascript: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+    html: 'bg-orange-500/20 text-orange-300 border-orange-400/30',
+    canvas: 'bg-purple-500/20 text-purple-300 border-purple-400/30',
+    webgl: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+    react: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
+    vue: 'bg-green-500/20 text-green-300 border-green-400/30',
+    animation: 'bg-pink-500/20 text-pink-300 border-pink-400/30'
+  };
+  const categoryIcons = {
+    css: '🎨',
+    javascript: '⚡',
+    html: '🌐',
+    canvas: '🖼️',
+    webgl: '🎮',
+    react: '⚛️',
+    vue: '💚',
+    animation: '✨'
   };
 
   // Mock data for now
@@ -211,6 +219,56 @@ const AnimatedComponent = () => {
 .menu-item {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border-radius: 50px;
+}      `.trim()
+    },
+    {
+      id: '8',
+      title: 'Semantic HTML5 Structure',
+      description: 'Modern HTML5 semantic elements with accessibility features',
+      category: 'html' as const,
+      tags: ['html5', 'semantic', 'accessibility', 'structure'],
+      author: { username: 'htmlpro', displayName: 'HTML Expert', isVerified: true, isPro: false },
+      likes: 167,
+      views: 823,
+      code: `
+<article role="main">
+  <header>
+    <h1>Article Title</h1>
+    <time datetime="2025-06-01">June 1, 2025</time>
+  </header>
+  <section>
+    <p>Content goes here...</p>
+  </section>
+  <aside aria-label="Related links">
+    <nav>
+      <ul>
+        <li><a href="#related">Related Article</a></li>
+      </ul>
+    </nav>
+  </aside>
+</article>
+      `.trim()
+    },
+    {
+      id: '9',
+      title: '3D WebGL Cube Renderer',
+      description: 'Interactive 3D cube with WebGL shaders and real-time rotation',
+      category: 'webgl' as const,
+      tags: ['webgl', '3d', 'shaders', 'cube', 'interactive'],
+      author: { username: 'glmaster', displayName: 'WebGL Pro', isVerified: true, isPro: true },
+      likes: 389,
+      views: 1987,
+      code: `
+const gl = canvas.getContext('webgl');
+const vertices = [
+  -1, -1,  1,   1, -1,  1,   1,  1,  1,  -1,  1,  1,
+  -1, -1, -1,  -1,  1, -1,   1,  1, -1,   1, -1, -1
+];
+
+function drawCube() {
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.useProgram(shaderProgram);
+  gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 }
       `.trim()
     }
@@ -397,11 +455,21 @@ const AnimatedComponent = () => {
                         <span>{snippet.likes}</span>
                         <Eye className="w-4 h-4 ml-2" />
                         <span>{snippet.views}</span>
-                      </div>
-                      <span className={`px-2 py-1 rounded-md text-xs font-medium ${
-                        categoryColors[snippet.category as keyof typeof categoryColors] || 
-                        'bg-gray-500/20 text-gray-400'
-                      }`}>
+                      </div>                      <span 
+                        className={`px-2 py-1 rounded-md text-xs font-medium ${
+                          categoryColors[snippet.category as keyof typeof categoryColors] || 
+                          'bg-gray-500/20 text-gray-300 border-gray-400/30'
+                        }`}
+                        style={{
+                          backdropFilter: 'blur(16px)',
+                          background: 'rgba(255, 255, 255, 0.1)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: '8px'
+                        }}
+                      >
+                        <span className="mr-1">
+                          {categoryIcons[snippet.category as keyof typeof categoryIcons] || '📄'}
+                        </span>
                         {snippet.category.toUpperCase()}
                       </span>
                     </div>

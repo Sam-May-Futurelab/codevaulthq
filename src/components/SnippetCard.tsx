@@ -24,17 +24,27 @@ interface SnippetCardProps {
 }
 
 const SnippetCard = ({ snippet }: SnippetCardProps) => {
-  const audio = AudioFeedback.getInstance();
-    const categoryColors = {
-    css: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    javascript: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    html: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-    canvas: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    webgl: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    react: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-    vue: 'bg-green-500/20 text-green-400 border-green-500/30',
-    animation: 'bg-pink-500/20 text-pink-400 border-pink-500/30'
-  };  return (
+  const audio = AudioFeedback.getInstance();  const categoryColors = {
+    css: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
+    javascript: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+    html: 'bg-orange-500/20 text-orange-300 border-orange-400/30',
+    canvas: 'bg-purple-500/20 text-purple-300 border-purple-400/30',
+    webgl: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+    react: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
+    vue: 'bg-green-500/20 text-green-300 border-green-400/30',
+    animation: 'bg-pink-500/20 text-pink-300 border-pink-400/30'
+  };
+
+  const categoryIcons = {
+    css: '🎨',
+    javascript: '⚡',
+    html: '🌐',
+    canvas: '🖼️',
+    webgl: '🎮',
+    react: '⚛️',
+    vue: '💚',
+    animation: '✨'
+  };return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
@@ -78,14 +88,34 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
               </div>
             </div>
           </div>
-        )}
-        
-        {/* Category Badge */}
-        <div className="absolute top-3 left-3">
-          <span className={`px-2 py-1 rounded text-xs font-medium ${
-            categoryColors[snippet.category as keyof typeof categoryColors] || 
-            'bg-gray-500/20 text-gray-400'
-          }`}>
+        )}        {/* Category Badge - Positioned bottom-right of preview for better visibility */}
+        <div 
+          className="absolute bottom-3 right-3 z-20" 
+          style={{ 
+            position: 'absolute',
+            bottom: '12px', 
+            right: '12px', 
+            zIndex: '999' 
+          }}
+        >          <span 
+            className={`px-3 py-2 rounded-lg text-xs font-bold border shadow-lg backdrop-blur-sm ${
+              categoryColors[snippet.category as keyof typeof categoryColors] || 
+              'bg-gray-500/20 text-gray-300 border-gray-400/30'
+            }`}
+            style={{
+              fontSize: '10px',
+              fontWeight: 'bold',
+              padding: '8px 12px',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(16px)',
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <span className="mr-1">
+              {categoryIcons[snippet.category as keyof typeof categoryIcons] || '📄'}
+            </span>
             {snippet.category.toUpperCase()}
           </span>
         </div>
@@ -111,32 +141,55 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
           minHeight: '220px', 
           maxHeight: '220px' 
         }}
-      >
-        {/* Title and Description - Top section */}
-        <div className="flex-shrink-0">
-          <Link
+      >        {/* Title and Description - Top section */}
+        <div className="flex-shrink-0">          <Link
             to={`/snippet/${snippet.id}`}
-            className="text-lg font-semibold text-white hover:text-vault-accent transition-colors line-clamp-1 leading-tight block"
+            className="text-lg font-semibold text-white hover:text-white/80 transition-colors line-clamp-1 leading-tight block"
+            style={{ 
+              color: '#ffffff !important' 
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8) !important';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#ffffff !important';
+            }}
           >
             {snippet.title}
           </Link>
           <p className="text-gray-400 text-sm mt-2 line-clamp-2 leading-relaxed">
             {snippet.description}
           </p>
-        </div>
-
-        {/* Middle section - Tags */}
-        <div className="flex flex-wrap gap-1.5 my-3">
+        </div>        {/* Middle section - Tags */}
+        <div 
+          className="flex flex-wrap gap-2 my-4"
+          style={{
+            gap: '8px',
+            margin: '16px 0'
+          }}
+        >
           {snippet.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="px-2 py-1 bg-vault-accent/10 text-vault-accent text-xs rounded border border-vault-accent/20 hover:border-vault-accent/40 transition-colors"
+              className="px-3 py-1.5 bg-vault-accent/10 text-vault-accent text-xs rounded-md border border-vault-accent/20 hover:border-vault-accent/40 transition-colors"
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                fontSize: '11px'
+              }}
             >
               {tag}
             </span>
           ))}
           {snippet.tags.length > 3 && (
-            <span className="px-2 py-1 text-gray-400 text-xs bg-vault-light/10 rounded border border-vault-light/20">
+            <span 
+              className="px-3 py-1.5 text-gray-400 text-xs bg-vault-light/10 rounded-md border border-vault-light/20"
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                fontSize: '11px'
+              }}
+            >
               +{snippet.tags.length - 3}
             </span>
           )}

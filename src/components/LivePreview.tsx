@@ -179,13 +179,9 @@ const LivePreview = ({ type, className = "" }: LivePreviewProps) => {
               width={160}
               height={160}
               className="w-full h-full object-cover"
-            />
-            {/* Canvas overlay indicator */}
-            <div className="absolute bottom-2 right-2 text-purple-300 text-xs font-mono opacity-80 bg-black/30 px-2 py-1 rounded backdrop-blur-sm">
-              &lt;canvas&gt;
-            </div>
+            />            {/* Canvas overlay indicator - Removed to avoid duplicate with SnippetCard badge */}
           </div>
-        );      case 'javascript':
+        );case 'javascript':
         return (
           <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-900/60 to-orange-900/60 overflow-hidden">
             {/* Interactive Button - Perfectly centered */}
@@ -414,11 +410,7 @@ const LivePreview = ({ type, className = "" }: LivePreviewProps) => {
               transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
               className="absolute bottom-2 left-2 w-3 h-3 bg-emerald-300 rounded-full"
             />
-            
-            {/* WebGL indicator */}
-            <div className="absolute bottom-2 right-2 text-emerald-300 text-xs font-mono opacity-80 bg-black/30 px-2 py-1 rounded backdrop-blur-sm">
-              WebGL
-            </div>
+              {/* WebGL indicator - Removed to avoid duplicate with SnippetCard badge */}
           </div>
         );
 
@@ -507,11 +499,7 @@ const LivePreview = ({ type, className = "" }: LivePreviewProps) => {
             {/* Edge indicators for full width test */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
             <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
-            
-            {/* React indicator */}
-            <div className="absolute bottom-2 right-2 text-cyan-300 text-xs font-mono opacity-80 bg-black/30 px-2 py-1 rounded backdrop-blur-sm">
-              ⚛️ React
-            </div>
+              {/* React indicator - Removed to avoid duplicate with SnippetCard badge */}
           </div>
         );
 
@@ -618,11 +606,7 @@ const LivePreview = ({ type, className = "" }: LivePreviewProps) => {
             {/* Side borders for width test */}
             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-green-400/50 to-transparent" />
             <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-transparent via-green-400/50 to-transparent" />
-            
-            {/* Vue indicator */}
-            <div className="absolute bottom-2 right-2 text-green-300 text-xs font-mono opacity-80 bg-black/30 px-2 py-1 rounded backdrop-blur-sm">
-              Vue.js
-            </div>
+              {/* Vue indicator - Removed to avoid duplicate with SnippetCard badge */}
           </div>
         );
 

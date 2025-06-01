@@ -100,8 +100,7 @@ const BrowsePage = () => {
       author: { username: 'vuedev', displayName: 'Vue Developer', isVerified: true },
       likes: 267,
       views: 1342
-    },
-    {
+    },    {
       id: '10',
       title: '3D Card Flip Animation',
       description: 'Stunning 3D card flip effect using CSS transforms and perspective',
@@ -110,6 +109,26 @@ const BrowsePage = () => {
       author: { username: '3dmaster', displayName: '3D Master', isVerified: true },
       likes: 423,
       views: 1950
+    },
+    {
+      id: '11',
+      title: 'Semantic HTML5 Structure',
+      description: 'Clean HTML5 markup with proper semantic elements and accessibility features',
+      category: 'html' as const,
+      tags: ['html5', 'semantic', 'accessibility', 'structure'],
+      author: { username: 'htmlpro', displayName: 'HTML Expert', isVerified: true },
+      likes: 156,
+      views: 789
+    },
+    {
+      id: '12',
+      title: 'WebGL Shader Effects',
+      description: 'Advanced WebGL shader effects with fragment shaders and real-time rendering',
+      category: 'webgl' as const,
+      tags: ['webgl', 'shader', 'effects', '3d'],
+      author: { username: 'gldev', displayName: 'GL Developer', isVerified: true, isPro: true },
+      likes: 298,
+      views: 1456
     }
   ];
   const categories = [
