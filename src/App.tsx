@@ -12,9 +12,8 @@ import './App.css';
 function App() {  return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
-        <Header />
-        <main>
-          <div className="container mx-auto px-6 py-8 max-w-7xl">
+        <Header />        <main>
+          <div className="px-4 py-8">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/snippet/:id" element={<SnippetDetail />} />

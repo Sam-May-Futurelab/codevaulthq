@@ -40,8 +40,8 @@ const HomePage = () => {
 
     return () => {
       cleanupFunctions.forEach(cleanup => cleanup());
-    };
-  }, []);
+    };  }, []);
+
   // Category colors for consistency
   const categoryColors = {
     css: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
@@ -49,42 +49,170 @@ const HomePage = () => {
     html: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     canvas: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
     webgl: 'bg-green-500/20 text-green-400 border-green-500/30',
+    react: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+    vue: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     animation: 'bg-pink-500/20 text-pink-400 border-pink-500/30'
   };
+
   // Mock data for now
   const featuredSnippets = [
     {
       id: '1',
       title: 'Floating Orb Animation',
-      description: 'Beautiful CSS animation with floating particles',
+      description: 'Mesmerizing CSS orb with floating particle trail effects',
       category: 'css' as const,
-      tags: ['animation', 'css', 'particles'],
+      tags: ['animation', 'css', 'particles', 'floating', 'orb'],
       author: { username: 'designmaster', displayName: 'Design Master', isVerified: true, isPro: true },
       likes: 245,
       views: 1250,
-      thumbnailUrl: '/api/placeholder/300/200'
+      code: `
+.floating-orb {
+  background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+  border-radius: 50%;
+  animation: float 3s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-15px) scale(1.1); }
+}
+      `.trim()
     },
     {
       id: '2', 
       title: 'Interactive Button Hover',
-      description: 'Smooth hover effects with CSS transforms',
-      category: 'css' as const,
-      tags: ['button', 'hover', 'transform'],
-      author: { username: 'cssdev', displayName: 'CSS Developer', isVerified: false, isPro: false },
+      description: 'Smooth hover effects with CSS transforms and shadows',
+      category: 'javascript' as const,
+      tags: ['button', 'hover', 'transform', 'interactive'],
+      author: { username: 'jsmaster', displayName: 'JS Wizard', isVerified: true, isPro: false },
       likes: 189,
       views: 890,
-      thumbnailUrl: '/api/placeholder/300/200'
+      code: `
+const button = document.querySelector('.hover-btn');
+button.addEventListener('mouseenter', () => {
+  button.style.transform = 'scale(1.05)';
+  button.style.boxShadow = '0 8px 25px rgba(251, 191, 36, 0.4)';
+});
+      `.trim()
     },
     {
       id: '3',
       title: 'Canvas Particle System',
-      description: 'Dynamic particle effects using HTML5 Canvas',
+      description: 'Dynamic particle effects with glow and motion trails',
       category: 'canvas' as const,
-      tags: ['canvas', 'particles', 'animation'],
+      tags: ['canvas', 'particles', 'animation', 'webgl'],
       author: { username: 'canvasking', displayName: 'Canvas King', isVerified: true, isPro: true },
       likes: 312,
       views: 1580,
-      thumbnailUrl: '/api/placeholder/300/200'
+      code: `
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+const particles = [];
+
+function createParticle() {
+  return {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    vx: (Math.random() - 0.5) * 2,
+    vy: (Math.random() - 0.5) * 2,
+    life: 60
+  };
+}
+      `.trim()
+    },
+    {
+      id: '4',
+      title: 'Morphing Loader Animation',
+      description: 'Elegant CSS loader with smooth morphing transitions',
+      category: 'animation' as const,
+      tags: ['loader', 'morphing', 'css', 'spinner'],
+      author: { username: 'animatrix', displayName: 'Animatrix Pro', isVerified: true, isPro: true },
+      likes: 178,
+      views: 967,
+      code: `
+.morphing-loader {
+  border: 2px solid #00ff88;
+  border-radius: 8px;
+  animation: morph 4s infinite linear;
+}
+
+@keyframes morph {
+  0% { border-radius: 8px; transform: rotate(0deg); }
+  25% { border-radius: 50%; }
+  50% { border-radius: 8px; transform: rotate(180deg); }
+  75% { border-radius: 50%; }
+  100% { border-radius: 8px; transform: rotate(360deg); }
+}
+      `.trim()    },
+    {
+      id: '5',
+      title: 'React Component Animation',
+      description: 'Beautiful React component with state transitions and hooks',
+      category: 'react' as const,
+      tags: ['react', 'hooks', 'animation', 'component'],
+      author: { username: 'reactpro', displayName: 'React Master', isVerified: true, isPro: true },
+      likes: 298,
+      views: 1456,
+      code: `
+const AnimatedComponent = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  return (
+    <motion.div
+      animate={{ scale: isVisible ? 1 : 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <h1>Hello React!</h1>
+    </motion.div>
+  );
+};
+      `.trim()
+    },
+    {
+      id: '6',
+      title: 'Vue.js Progressive Animation',
+      description: 'Elegant Vue component with progressive reveal animations',
+      category: 'vue' as const,
+      tags: ['vue', 'progressive', 'animation', 'transition'],
+      author: { username: 'vuemaster', displayName: 'Vue Expert', isVerified: true, isPro: false },
+      likes: 234,
+      views: 1123,
+      code: `
+<template>
+  <transition name="slide-fade">
+    <div v-if="show" class="animated-box">
+      <h1>Vue Animation</h1>
+    </div>
+  </transition>
+</template>
+
+<style>
+.slide-fade-enter-active {
+  transition: all 0.6s ease;
+}
+</style>
+      `.trim()
+    },
+    {
+      id: '7',
+      title: 'Gooey Navigation Menu',
+      description: 'Liquid morphing navigation with SVG path animations',
+      category: 'css' as const,
+      tags: ['navigation', 'gooey', 'svg', 'morphing'],
+      author: { username: 'liquidui', displayName: 'Liquid UI', isVerified: false, isPro: true },
+      likes: 423,
+      views: 2100,
+      code: `
+.gooey-menu {
+  filter: url('#gooey');
+}
+
+.menu-item {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 50px;
+}
+      `.trim()
     }
   ];
   const stats = [

@@ -9,13 +9,12 @@ const BrowsePage = () => {
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
   // Mock data - in a real app, this would come from an API
   const allSnippets = [
     {
       id: '1',
       title: 'Floating Orb Animation',
-      description: 'Beautiful CSS animation with floating particles and glowing effects',
+      description: 'Beautiful CSS animation with floating particles and glowing effects that creates mesmerizing visuals',
       category: 'css' as const,
       tags: ['animation', 'css', 'particles', 'glow'],
       author: { username: 'designmaster', displayName: 'Design Master', isVerified: true },
@@ -25,61 +24,94 @@ const BrowsePage = () => {
     },
     {
       id: '2', 
-      title: 'Interactive Button Hover',
-      description: 'Smooth hover effects with CSS transforms and transitions',
-      category: 'css' as const,
+      title: 'Interactive Button System',
+      description: 'Advanced hover effects with CSS transforms, transitions and dynamic JavaScript interactions',
+      category: 'javascript' as const,
       tags: ['button', 'hover', 'transform', 'interaction'],
-      author: { username: 'cssdev', displayName: 'CSS Developer', isVerified: false },
+      author: { username: 'jsdev', displayName: 'JS Developer', isVerified: false },
       likes: 189,
-      views: 890,
-      thumbnailUrl: '/api/placeholder/300/200'
+      views: 890
     },
     {
       id: '3',
-      title: 'Canvas Particle System',
-      description: 'Dynamic particle effects using HTML5 Canvas with mouse interaction',
+      title: 'Canvas Particle Engine',
+      description: 'High-performance particle system using HTML5 Canvas with mouse interaction and physics',
       category: 'canvas' as const,
-      tags: ['canvas', 'particles', 'animation', 'interactive'],
+      tags: ['canvas', 'particles', 'physics', 'interactive'],
       author: { username: 'canvasking', displayName: 'Canvas King', isVerified: true },
       likes: 312,
-      views: 1580,
-      thumbnailUrl: '/api/placeholder/300/200'
+      views: 1580
     },
     {
       id: '4',
-      title: 'Morphing Loader',
-      description: 'CSS-only loading animation with morphing shapes',
-      category: 'css' as const,
+      title: 'Morphing Shape Loader',
+      description: 'CSS-only loading animation with smooth morphing shapes and color transitions',
+      category: 'animation' as const,
       tags: ['loader', 'animation', 'morphing', 'css'],
       author: { username: 'animatemaster', displayName: 'Animate Master', isVerified: true },
       likes: 456,
-      views: 2340,
-      thumbnailUrl: '/api/placeholder/300/200'
+      views: 2340
     },
     {
       id: '5',
       title: 'WebGL Shader Effects',
-      description: 'Advanced WebGL shader effects with fragment shaders',
+      description: 'Advanced WebGL shader effects with fragment shaders and real-time rendering',
       category: 'webgl' as const,
       tags: ['webgl', 'shader', 'effects', '3d'],
       author: { username: 'gldev', displayName: 'GL Developer', isVerified: false },
       likes: 178,
-      views: 756,
-      thumbnailUrl: '/api/placeholder/300/200'
+      views: 756
     },
     {
       id: '6',
       title: 'Scroll-triggered Animations',
-      description: 'JavaScript animations triggered by scroll events',
+      description: 'JavaScript animations that trigger on scroll events with smooth easing and performance optimization',
       category: 'javascript' as const,
       tags: ['scroll', 'animation', 'javascript', 'trigger'],
       author: { username: 'scrollmaster', displayName: 'Scroll Master', isVerified: true },
       likes: 234,
-      views: 1120,
-      thumbnailUrl: '/api/placeholder/300/200'
+      views: 1120
+    },
+    {
+      id: '7',
+      title: 'CSS Grid Masonry Layout',
+      description: 'Modern CSS Grid implementation of masonry layout with responsive breakpoints',
+      category: 'css' as const,
+      tags: ['grid', 'layout', 'responsive', 'masonry'],
+      author: { username: 'layoutpro', displayName: 'Layout Pro', isVerified: true, isPro: true },
+      likes: 567,
+      views: 2890    },
+    {
+      id: '8',
+      title: 'React State Management Demo',
+      description: 'Advanced React component demonstrating state management with beautiful animations',
+      category: 'react' as const,
+      tags: ['react', 'state', 'management', 'hooks'],
+      author: { username: 'reactguru', displayName: 'React Guru', isVerified: true, isPro: true },
+      likes: 389,
+      views: 1724
+    },
+    {
+      id: '9',
+      title: 'Vue.js Composition API',
+      description: 'Modern Vue component using Composition API with elegant transitions',
+      category: 'vue' as const,
+      tags: ['vue', 'composition', 'api', 'modern'],
+      author: { username: 'vuedev', displayName: 'Vue Developer', isVerified: true },
+      likes: 267,
+      views: 1342
+    },
+    {
+      id: '10',
+      title: '3D Card Flip Animation',
+      description: 'Stunning 3D card flip effect using CSS transforms and perspective',
+      category: 'animation' as const,
+      tags: ['3d', 'card', 'flip', 'transform'],
+      author: { username: '3dmaster', displayName: '3D Master', isVerified: true },
+      likes: 423,
+      views: 1950
     }
   ];
-
   const categories = [
     { id: 'all', label: 'All Categories' },
     { id: 'css', label: 'CSS' },
@@ -87,6 +119,8 @@ const BrowsePage = () => {
     { id: 'html', label: 'HTML' },
     { id: 'canvas', label: 'Canvas' },
     { id: 'webgl', label: 'WebGL' },
+    { id: 'react', label: 'React' },
+    { id: 'vue', label: 'Vue.js' },
     { id: 'animation', label: 'Animation' }
   ];
 

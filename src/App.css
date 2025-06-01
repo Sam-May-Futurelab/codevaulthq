@@ -748,8 +748,7 @@
 
 /* Snippet card enhancements */
 .snippet-card {
-  max-width: 280px;
-  height: 392px; /* 5:7 aspect ratio at 280px width */
+  /* Remove fixed dimensions - let content determine size */
 }
 
 .snippet-card .interactive-card {
@@ -757,42 +756,51 @@
 }
 
 .snippet-card .interactive-card:hover {
-  transform: translateY(-12px) rotateX(8deg) rotateY(-2deg);
+  transform: translateY(-8px);
   box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.4),
-    0 0 40px rgba(14, 165, 233, 0.3);
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(14, 165, 233, 0.2);
 }
 
-/* Playing card dimensions for grid layouts */
+/* Better grid layouts with FIXED card sizes */
 .snippet-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  justify-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  justify-items: stretch;
+}
+
+/* FORCE consistent card dimensions */
+.snippet-grid > * {
+  height: 420px; /* Fixed total card height */
+  min-height: 420px;
+  max-height: 420px;
 }
 
 /* Mobile responsive card sizing */
 @media (max-width: 768px) {
-  .snippet-card {
-    max-width: 260px;
-    height: 364px; /* Maintain 5:7 aspect ratio */
+  .snippet-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
-  .snippet-grid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
+  .snippet-grid > * {
+    height: 380px; /* Slightly smaller on mobile */
+    min-height: 380px;
+    max-height: 380px;
   }
 }
 
 @media (max-width: 480px) {
-  .snippet-card {
-    max-width: 240px;
-    height: 336px; /* Maintain 5:7 aspect ratio */
-  }
-  
   .snippet-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+  
+  .snippet-grid > * {
+    height: 360px; /* Even smaller on small mobile */
+    min-height: 360px;
+    max-height: 360px;
   }
 }
 
