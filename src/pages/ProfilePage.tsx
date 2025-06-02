@@ -3,7 +3,7 @@ import { User, Upload, Eye, Heart, Calendar, Code, Plus, ArrowRight } from 'luci
 import SnippetCard from '../components/SnippetCard.tsx';
 import { useAuth } from '../hooks/useAuth';
 import { useUserSnippets, useDeleteSnippet } from '../hooks/useFirebaseData';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {

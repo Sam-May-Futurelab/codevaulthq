@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Editor } from '@monaco-editor/react';
-import { Play, Eye, Save, Upload, Tag, Palette, Code2, FileImage, RefreshCw, Layout, Settings, Sparkles, Trash2 } from 'lucide-react';
+import { Play, Eye, Save, Upload, Tag, Palette, Code2, RefreshCw, Layout, Settings, Sparkles, Trash2 } from 'lucide-react';
 import FirebaseDbService from '../services/FirebaseDbService';
 import { useAuth } from '../hooks/useAuth.tsx';
 import AuthModal from '../components/AuthModal';
@@ -36,9 +36,7 @@ const UploadPage = () => {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const [colorPickerPosition, setColorPickerPosition] = useState({ x: 0, y: 0 });
-  const [editorFontSize, setEditorFontSize] = useState(16);
-  const [editorWordWrap, setEditorWordWrap] = useState<'on' | 'off'>('on');
-  const [editorLineNumbers, setEditorLineNumbers] = useState<'on' | 'off'>('on');  const previewRef = useRef<HTMLIFrameElement>(null);
+  const [editorFontSize, setEditorFontSize] = useState(16);  const previewRef = useRef<HTMLIFrameElement>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const editorRef = useRef<any>(null);
   const currentBlobUrlRef = useRef<string | null>(null);// Auto-update preview with debouncing
@@ -209,16 +207,6 @@ const UploadPage = () => {
     };
     return gradients[categoryKey as keyof typeof gradients] || '#6B7280, #4B5563';
   };
-
-  // Legacy categories for backward compatibility
-  const categories = [
-    { id: 'ui-components', label: 'UI Components', icon: Code2, color: 'text-blue-400' },
-    { id: 'animations', label: 'Animations', icon: Play, color: 'text-purple-400' },
-    { id: 'layouts', label: 'Layouts', icon: FileImage, color: 'text-green-400' },
-    { id: 'effects', label: 'Visual Effects', icon: Palette, color: 'text-pink-400' },
-    { id: 'games', label: 'Games & Interactive', icon: Code2, color: 'text-orange-400' },
-    { id: 'utilities', label: 'Tools & Utilities', icon: Code2, color: 'text-gray-400' }
-  ];
 
   const editorTabs = [
     { id: 'html', label: 'HTML', language: 'html' },
@@ -967,8 +955,8 @@ const UploadPage = () => {
                     fontFamily: 'JetBrains Mono, Monaco, Consolas, monospace',
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
-                    wordWrap: editorWordWrap,
-                    lineNumbers: editorLineNumbers,
+                    wordWrap: 'on',
+                    lineNumbers: 'on',
                     glyphMargin: false,
                     folding: true,
                     lineDecorationsWidth: 0,
