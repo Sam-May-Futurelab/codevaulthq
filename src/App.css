@@ -783,13 +783,36 @@ a[href*="/snippet/"]:hover {
   justify-content: center;
 }
 
-/* FORCE consistent card dimensions */
+/* FORCE consistent card dimensions - EXTRA STRONG */
 .snippet-grid > * {
-  height: 480px; /* Fixed total card height - increased from 420px */
-  min-height: 480px;
-  max-height: 480px;
+  height: 480px !important; /* Fixed total card height - increased from 420px */
+  min-height: 480px !important;
+  max-height: 480px !important;
   max-width: 400px;
   margin: 0 auto;
+  overflow: hidden; /* Prevent content from expanding card */
+}
+
+/* Force consistent card dimensions specifically for SnippetCard components */
+.snippet-grid .bg-vault-medium {
+  height: 480px !important;
+  min-height: 480px !important;
+  max-height: 480px !important;
+  overflow: hidden !important;
+}
+
+/* Ensure iframe previews don't affect card dimensions */
+.snippet-grid iframe {
+  max-height: 260px !important;
+  overflow: hidden !important;
+}
+
+/* Force preview container to maintain fixed height */
+.snippet-grid .relative {
+  height: 260px !important;
+  min-height: 260px !important;
+  max-height: 260px !important;
+  overflow: hidden !important;
 }
 
 /* Mobile responsive card sizing */
@@ -798,10 +821,16 @@ a[href*="/snippet/"]:hover {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-    .snippet-grid > * {
-    height: 440px; /* Slightly smaller on mobile - increased from 380px */
-    min-height: 440px;
-    max-height: 440px;
+  .snippet-grid > * {
+    height: 440px !important; /* Slightly smaller on mobile - increased from 380px */
+    min-height: 440px !important;
+    max-height: 440px !important;
+    overflow: hidden !important;
+  }
+  .snippet-grid .bg-vault-medium {
+    height: 440px !important;
+    min-height: 440px !important;
+    max-height: 440px !important;
   }
 }
 
@@ -810,10 +839,16 @@ a[href*="/snippet/"]:hover {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-    .snippet-grid > * {
-    height: 420px; /* Even smaller on small mobile - increased from 360px */
-    min-height: 420px;
-    max-height: 420px;
+  .snippet-grid > * {
+    height: 420px !important; /* Even smaller on small mobile - increased from 360px */
+    min-height: 420px !important;
+    max-height: 420px !important;
+    overflow: hidden !important;
+  }
+  .snippet-grid .bg-vault-medium {
+    height: 420px !important;
+    min-height: 420px !important;
+    max-height: 420px !important;
   }
 }
 
