@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, Settings, LogOut, Code, Heart, Download } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.tsx';
+import { useNavigate } from 'react-router-dom';
 
 interface UserProfileDropdownProps {
   onSignInClick: () => void;
@@ -10,6 +11,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ onSignInClick
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { currentUser, userProfile, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -124,11 +126,10 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ onSignInClick
           </div>
 
           {/* Menu Items */}
-          <div className="py-2">
-            <button
+          <div className="py-2">            <button
               onClick={() => {
                 setIsOpen(false);
-                // Navigate to profile page
+                navigate('/profile');
               }}
               className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center space-x-3"
             >

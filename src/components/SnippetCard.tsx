@@ -1,4 +1,4 @@
-import { Heart, Eye, User, CheckCircle } from 'lucide-react';
+import { Heart, Eye, User, CheckCircle, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -11,9 +11,12 @@ import type { SnippetWithMetrics } from '../types';
 
 interface SnippetCardProps {
   snippet: SnippetData | SnippetWithAnalytics | SnippetWithMetrics;
+  showDeleteButton?: boolean;
+  onDelete?: (snippetId: string) => void;
+  isDeleting?: boolean;
 }
 
-const SnippetCard = ({ snippet }: SnippetCardProps) => {
+const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting = false }: SnippetCardProps) => {
   const audio = AudioFeedback.getInstance();
   const { trackInteraction } = useSnippetInteraction(snippet.id);
   const [isLiked, setIsLiked] = useState(false);
@@ -379,17 +382,45 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
                 <span className="text-xs">{currentStats.views}</span>
               </div>
             </div>
-          </div>
-
-          {/* Action Buttons */}
+          </div>          {/* Action Buttons */}
           <div className="mt-4 pt-2">
-            <Link
-              to={`/snippet/${snippet.id}`}
-              onClick={handleViewCode}
-              className="w-full bg-vault-accent hover:bg-vault-accent/80 text-black py-2.5 px-4 rounded-lg text-sm font-medium transition-colors text-center block"
-            >
-              View Code
-            </Link>
+            {showDeleteButton ? (
+              <div className="flex space-x-2">
+                <Link
+                  to={`/snippet/${snippet.id}`}
+                  onClick={handleViewCode}
+                  className="flex-1 bg-vault-accent hover:bg-vault-accent/80 text-black py-2.5 px-4 rounded-lg text-sm font-medium transition-colors text-center block"
+                >
+                  View Code
+                </Link>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (onDelete) {
+                      onDelete(snippet.id);
+                    }
+                  }}
+                  disabled={isDeleting}
+                  className="px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  title="Delete snippet"
+                >
+                  {isDeleting ? (
+                    <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            ) : (
+              <Link
+                to={`/snippet/${snippet.id}`}
+                onClick={handleViewCode}
+                className="w-full bg-vault-accent hover:bg-vault-accent/80 text-black py-2.5 px-4 rounded-lg text-sm font-medium transition-colors text-center block"
+              >
+                View Code
+              </Link>
+            )}
           </div>
         </div>
       </div>

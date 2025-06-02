@@ -2,19 +2,44 @@ import { motion } from 'framer-motion';
 import { User, Upload, Eye, Heart, Calendar, Code } from 'lucide-react';
 import SnippetCard from '../components/SnippetCard.tsx';
 import { useAuth } from '../hooks/useAuth';
-import { useUserSnippets } from '../hooks/useFirebaseData';
+import { useUserSnippets, useDeleteSnippet } from '../hooks/useFirebaseData';
+import { useState } from 'react';
 
 const ProfilePage = () => {
   const { currentUser } = useAuth();
+  const [deletingSnippetId, setDeletingSnippetId] = useState<string | null>(null);
   
   // Get user's snippets
-  const { snippets: userSnippets, loading } = useUserSnippets(currentUser?.uid);
+  const { snippets: userSnippets, loading, refetch } = useUserSnippets(currentUser?.uid);
+  const { deleteSnippet } = useDeleteSnippet();
+  
+  // Handle delete snippet
+  const handleDeleteSnippet = async (snippetId: string) => {
+    if (!confirm('Are you sure you want to delete this snippet? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setDeletingSnippetId(snippetId);
+      await deleteSnippet(snippetId);
+      
+      // Show success message
+      window.showToast?.('Snippet deleted successfully', 'success');
+      
+      // Refresh the snippets list
+      refetch();
+    } catch (error) {
+      console.error('Failed to delete snippet:', error);
+      window.showToast?.('Failed to delete snippet', 'error');
+    } finally {
+      setDeletingSnippetId(null);
+    }  };
   
   // Calculate stats
   const totalViews = userSnippets.reduce((sum, snippet) => 
     sum + (snippet.analytics?.views || snippet.metrics?.views || snippet.stats?.views || 0), 0
   );
-  const totalLikes = userSnippets.reduce((sum, snippet) => 
+  const totalLikes = userSnippets.reduce((sum, snippet) =>
     sum + (snippet.analytics?.likes || snippet.metrics?.likes || snippet.stats?.likes || 0), 0
   );
   if (!currentUser) {
@@ -111,14 +136,18 @@ const ProfilePage = () => {
             </div>
           ) : userSnippets.length > 0 ? (
             <div className="snippet-grid">
-              {userSnippets.map((snippet, index) => (
-                <motion.div
+              {userSnippets.map((snippet, index) => (                <motion.div
                   key={snippet.id}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                 >
-                  <SnippetCard snippet={snippet} />
+                  <SnippetCard 
+                    snippet={snippet} 
+                    showDeleteButton={true}
+                    onDelete={handleDeleteSnippet}
+                    isDeleting={deletingSnippetId === snippet.id}
+                  />
                 </motion.div>
               ))}
             </div>

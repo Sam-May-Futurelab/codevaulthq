@@ -19,11 +19,11 @@ function App() {
           <Header />
           <ToastContainer />
           <main>
-            <div className="px-4 py-8">
-              <Routes>
+            <div className="px-4 py-8">              <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/snippet/:id" element={<SnippetDetail />} />
                 <Route path="/upload" element={<UploadPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/:username" element={<ProfilePage />} />
                 <Route path="/browse" element={<BrowsePage />} />
               </Routes>

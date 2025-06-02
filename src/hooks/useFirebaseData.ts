@@ -142,6 +142,33 @@ export const useCreateSnippet = () => {
   return { createSnippet, loading, error };
 };
 
+// Hook for deleting snippets
+export const useDeleteSnippet = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useAuth();
+
+  const deleteSnippet = useCallback(async (snippetId: string) => {
+    if (!currentUser) {
+      throw new Error('User must be authenticated to delete snippets');
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      await FirebaseDbService.deleteSnippet(snippetId);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete snippet';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  return { deleteSnippet, loading, error };
+};
+
 // Hook for snippet interactions
 export const useSnippetInteraction = (snippetId: string) => {
   const [loading, setLoading] = useState(false);
