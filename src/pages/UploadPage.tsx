@@ -159,15 +159,30 @@ const UploadPage = () => {
     
     // Auto-save will be triggered by the useEffect watching code changes
   };
-
   const addTag = () => {
-    if (tagInput.trim() && !snippetData.tags.includes(tagInput.trim().toLowerCase())) {
+    if (!tagInput.trim()) return;
+    
+    // Split by commas and process each tag
+    const newTags = tagInput
+      .split(',')
+      .map(tag => tag.trim().toLowerCase())
+      .filter(tag => tag.length > 0 && !snippetData.tags.includes(tag));
+    
+    if (newTags.length > 0) {
       setSnippetData(prev => ({
         ...prev,
-        tags: [...prev.tags, tagInput.trim().toLowerCase()]
+        tags: [...prev.tags, ...newTags]
       }));
-      setTagInput('');
+      
+      // Show appropriate feedback
+      if (newTags.length === 1) {
+        window.showToast?.(`Added tag: ${newTags[0]}`, 'success');
+      } else {
+        window.showToast?.(`Added ${newTags.length} tags: ${newTags.join(', ')}`, 'success');
+      }
     }
+    
+    setTagInput('');
   };
   const removeTag = (tagToRemove: string) => {
     setSnippetData(prev => ({
@@ -270,9 +285,8 @@ const UploadPage = () => {
         window.showToast?.('Please enter a description for your snippet', 'error');
         return;
       }
-      
-      if (snippetData.description.length > 120) {
-        window.showToast?.('Description cannot exceed 120 characters', 'error');
+        if (snippetData.description.length > 140) {
+        window.showToast?.('Description cannot exceed 140 characters', 'error');
         return;
       }// Prepare snippet data for Firebase
       // Find the complete category information
@@ -396,39 +410,36 @@ const UploadPage = () => {
                     className="w-full bg-white border-2 border-gray-300 rounded-xl px-6 py-4 text-gray-800 placeholder-gray-500 focus:border-vault-accent focus:outline-none transition-all duration-200 text-lg"
                     placeholder="Enter snippet title"
                   />
-                </div>                <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-4">
+                </div>                <div>                  <label className="block text-base font-semibold text-gray-700 mb-4">
                     Description
                     <span className="text-sm text-gray-500 ml-2">
-                      ({snippetData.description.length}/120 characters)
+                      ({snippetData.description.length}/140 characters)
                     </span>
                   </label>
                   <textarea
                     value={snippetData.description}
                     onChange={(e) => {
-                      const newValue = e.target.value;                      if (newValue.length <= 120) {
+                      const newValue = e.target.value;                      if (newValue.length <= 140) {
                         setSnippetData(prev => ({ ...prev, description: newValue }));
                       } else {
-                        window.showToast?.('Description cannot exceed 120 characters', 'error');
+                        window.showToast?.('Description cannot exceed 140 characters', 'error');
                       }
                     }}
-                    rows={4}
-                    className={`w-full bg-white border-2 rounded-xl px-6 py-4 text-gray-800 placeholder-gray-500 focus:outline-none transition-all duration-200 resize-none text-lg ${
-                      snippetData.description.length > 100 
+                    rows={4}                    className={`w-full bg-white border-2 rounded-xl px-6 py-4 text-gray-800 placeholder-gray-500 focus:outline-none transition-all duration-200 resize-none text-lg ${
+                      snippetData.description.length > 120 
                         ? 'border-orange-400 focus:border-orange-500' 
                         : 'border-gray-300 focus:border-vault-accent'
                     }`}
-                    placeholder="Describe your snippet and its functionality (max 120 characters)"
-                  />
-                  {snippetData.description.length > 100 && (
+                    placeholder="Describe your snippet and its functionality (max 140 characters)"
+                  />                  {snippetData.description.length > 120 && (
                     <div className={`mt-2 text-sm font-medium ${
-                      snippetData.description.length >= 120 
+                      snippetData.description.length >= 140 
                         ? 'text-red-600' 
                         : 'text-orange-600'
                     }`}>
-                      {snippetData.description.length >= 120 
+                      {snippetData.description.length >= 140 
                         ? '⚠️ Maximum character limit reached' 
-                        : `📝 ${120 - snippetData.description.length} characters remaining`}
+                        : `📝 ${140 - snippetData.description.length} characters remaining`}
                     </div>
                   )}
                 </div><div>
@@ -459,9 +470,11 @@ const UploadPage = () => {
                       </button>
                     ))}
                   </div>
-                </div><div>
-                  <label className="block text-xl font-bold text-gray-700 mb-8">
+                </div><div>                  <label className="block text-xl font-bold text-gray-700 mb-8">
                     Tags
+                    <span className="block text-sm text-gray-500 font-normal mt-2">
+                      Add individual tags or use commas to add multiple at once (e.g., "react, animation, css")
+                    </span>
                   </label>
                   <div className="space-y-6">
                     <div className="flex space-x-4">
@@ -476,7 +489,7 @@ const UploadPage = () => {
                           }
                         }}
                         className="flex-1 bg-white border-3 border-gray-300 rounded-2xl px-8 py-5 text-gray-800 placeholder-gray-500 focus:border-vault-accent focus:outline-none transition-all duration-200 text-lg font-medium"
-                        placeholder="Add tags (press Enter)"
+                        placeholder="Add tags (comma separated: react, animation, css)"
                       />
                       <button
                         onClick={addTag}
@@ -486,7 +499,32 @@ const UploadPage = () => {
                         <Tag className="w-6 h-6" />
                         <span>Add</span>
                       </button>
-                    </div>                    {snippetData.tags.length > 0 && (
+                    </div>
+
+                    {/* Tag Preview */}
+                    {tagInput.trim() && tagInput.includes(',') && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                        <div className="text-sm font-semibold text-yellow-800 mb-2">
+                          🏷️ Will add these tags:
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {tagInput
+                            .split(',')
+                            .map(tag => tag.trim().toLowerCase())
+                            .filter(tag => tag.length > 0 && !snippetData.tags.includes(tag))
+                            .map((tag, index) => (
+                              <span
+                                key={index}
+                                className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-lg text-sm font-medium border border-yellow-300"
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {snippetData.tags.length > 0 && (
                       <div className="flex flex-wrap gap-4">
                         {snippetData.tags.map((tag) => (
                           <span
