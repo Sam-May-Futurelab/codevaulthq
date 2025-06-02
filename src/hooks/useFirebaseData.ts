@@ -17,9 +17,9 @@ export const useFirebaseSnippets = (options?: {
   const [snippets, setSnippets] = useState<SnippetWithMetrics[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let timeoutId: NodeJS.Timeout | undefined;
 
     const fetchSnippets = async () => {
       try {
@@ -27,9 +27,20 @@ export const useFirebaseSnippets = (options?: {
         setError(null);
 
         if (options?.realtime) {
+          // Set a timeout to prevent indefinite loading
+          timeoutId = setTimeout(() => {
+            setLoading(false);
+          }, 5000); // 5 second timeout
+
           // Real-time subscription
           unsubscribe = FirebaseDbService.subscribeToSnippets(
             (updatedSnippets) => {
+              // Clear timeout since we got a response
+              if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = undefined;
+              }
+              
               const convertedSnippets = updatedSnippets
                 .filter(snippet => snippet.id) // Filter out snippets without ID
                 .map(snippet => convertFirebaseSnippet(snippet as any));
@@ -50,6 +61,10 @@ export const useFirebaseSnippets = (options?: {
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch snippets');
         setLoading(false);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = undefined;
+        }
       }
     };
 
@@ -58,6 +73,9 @@ export const useFirebaseSnippets = (options?: {
     return () => {
       if (unsubscribe) {
         unsubscribe();
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, [options?.authorId, options?.language, options?.limitCount, options?.realtime]);
