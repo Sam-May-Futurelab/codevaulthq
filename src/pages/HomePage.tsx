@@ -6,7 +6,7 @@ import ThreeHero from '../components/ThreeHero.tsx';
 import SnippetCard from '../components/SnippetCard.tsx';
 import TagCloud from '../components/TagCloud.tsx';
 import { GSAPAnimations } from '../utils/GSAPAnimations';
-import { useTopRankedSnippets, useTrendingSnippets } from '../hooks/useFirebaseData';
+import { useFirebaseSnippets } from '../hooks/useFirebaseData';
 import { usePlatformStats } from '../hooks/useSnippetData';
 import { snippetsData } from '../data/snippets';
 import DataSeeder from '../services/DataSeeder';
@@ -16,28 +16,68 @@ const HomePage = () => {
   const statsRef = useRef<HTMLDivElement>(null);
   const [isSeeding, setIsSeeding] = useState(false);
   
-  // Use Firebase hooks for real-time data
-  const { snippets: topSnippets, loading: loadingTop, error: errorTop } = useTopRankedSnippets(10);
-  const { snippets: trendingSnippets, loading: loadingTrending, error: errorTrending } = useTrendingSnippets(6);
+  // Get Firebase snippets (user uploaded)
+  const { snippets: firebaseSnippets, loading: loadingFirebase, error: errorFirebase } = useFirebaseSnippets({
+    orderByField: 'createdAt',
+    orderDirection: 'desc',
+    limitCount: 50,
+    realtime: true
+  });
+
   const { stats: platformStats, loading: loadingStats, error: errorStats } = usePlatformStats();
+  
+  // Combine Firebase snippets with mock data
+  const [allSnippets, setAllSnippets] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const mockSnippetsArray = Object.values(snippetsData);
+    const combinedSnippets = [
+      ...firebaseSnippets,
+      ...mockSnippetsArray
+    ];
+    
+    // Remove duplicates based on ID
+    const uniqueSnippets = combinedSnippets.filter((snippet, index, self) => 
+      index === self.findIndex(s => s.id === snippet.id)
+    );
+    
+    setAllSnippets(uniqueSnippets);
+  }, [firebaseSnippets]);
+  
+  // Get trending and top snippets from combined data
+  const getTrendingSnippets = (limit = 6) => {
+    return [...allSnippets]
+      .sort((a, b) => {
+        const aViews = a.stats?.views || a.metrics?.views || a.analytics?.views || 0;
+        const bViews = b.stats?.views || b.metrics?.views || b.analytics?.views || 0;
+        return bViews - aViews;
+      })
+      .slice(0, limit);
+  };
+  
+  const getTopSnippets = (limit = 10) => {
+    return [...allSnippets]
+      .sort((a, b) => {
+        const aLikes = a.stats?.likes || a.metrics?.likes || a.analytics?.likes || 0;
+        const bLikes = b.stats?.likes || b.metrics?.likes || b.analytics?.likes || 0;
+        return bLikes - aLikes;
+      })
+      .slice(0, limit);
+  };
+  
+  const displayTrendingSnippets = getTrendingSnippets(6);
+  const displayTopSnippets = getTopSnippets(10);
   
   // Debug Firebase connection
   console.log('Firebase Connection Debug:', {
-    topSnippets: topSnippets.length,
-    loadingTop,
-    errorTop,
-    trendingSnippets: trendingSnippets.length,
-    loadingTrending,
-    errorTrending,
+    firebaseSnippets: firebaseSnippets.length,
+    allSnippets: allSnippets.length,
+    loadingFirebase,
+    errorFirebase,
     platformStats,
     loadingStats,
     errorStats
   });
-  
-  // Fallback to mock data if Firebase data is empty
-  const mockSnippetsArray = Object.values(snippetsData);
-  const displayTrendingSnippets = trendingSnippets.length > 0 ? trendingSnippets : mockSnippetsArray.slice(0, 6);
-  const displayTopSnippets = topSnippets.length > 0 ? topSnippets : mockSnippetsArray.slice(0, 10);
 
   const seedDatabase = async () => {
     if (isSeeding) return;
@@ -107,6 +147,11 @@ const getViews = (snippet: any) => {
   return snippet.views || 0;
 };
 const getCategory = (snippet: any) => {
+  // Handle new hierarchical category structure
+  if (snippet.category && typeof snippet.category === 'object' && snippet.category.id) {
+    return snippet.category.id;
+  }
+  // Fallback to old format or language field
   return snippet.category || snippet.language || 'javascript';
 };
 
@@ -281,9 +326,9 @@ const getCategory = (snippet: any) => {
               <p className="text-sm text-vault-accent font-code">
                 ✨ Curated by creative coders across the cosmos
               </p>
-            </motion.div>            {loadingTrending ? (
+            </motion.div>            {loadingFirebase ? (
               <div className="text-center py-12">
-                <div className="text-vault-accent text-lg">Loading trending snippets...</div>
+                <div className="text-vault-accent text-lg">Loading snippets...</div>
                 {import.meta.env.DEV && (
                   <button
                     onClick={seedDatabase}
@@ -296,7 +341,7 @@ const getCategory = (snippet: any) => {
               </div>
             ) : (
               <div className="snippet-grid">
-                {displayTrendingSnippets.map((snippet, index) => (
+                {displayTrendingSnippets.map((snippet: any, index: number) => (
                   <motion.div
                     key={snippet.id}
                     initial={{ opacity: 0, y: 30 }}
@@ -344,10 +389,8 @@ const getCategory = (snippet: any) => {
               <p className="text-sm text-vault-purple font-code">
                 🚀 Ranked by community engagement and creativity
               </p>
-            </motion.div>
-
-            {/* Horizontal Scroll Container */}
-            <div className="relative">              {loadingTop ? (
+            </motion.div>            {/* Horizontal Scroll Container */}
+            <div className="relative">              {loadingFirebase ? (
                 <div className="text-center py-12">
                   <div className="text-vault-purple text-lg">Loading top snippets...</div>
                 </div>
@@ -492,13 +535,14 @@ const getCategory = (snippet: any) => {
                 className="px-4 py-2 bg-vault-accent text-black rounded-lg font-bold hover:bg-vault-accent/80 transition-colors disabled:opacity-50"
               >
                 {isSeeding ? 'Seeding...' : 'Seed Firebase Data'}
-              </button>
-              <button
+              </button>              <button
                 onClick={() => {
                   console.log('Firebase Debug Info:', {
-                    topSnippets: topSnippets.length,
-                    trendingSnippets: trendingSnippets.length,
-                    errors: { errorTop, errorTrending, errorStats }
+                    firebaseSnippets: firebaseSnippets.length,
+                    allSnippets: allSnippets.length,
+                    displayTrending: displayTrendingSnippets.length,
+                    displayTop: displayTopSnippets.length,
+                    errors: { errorFirebase, errorStats }
                   });
                 }}
                 className="px-4 py-2 bg-gray-600 text-white rounded-lg font-bold hover:bg-gray-500 transition-colors"
@@ -506,9 +550,9 @@ const getCategory = (snippet: any) => {
                 Debug Firebase
               </button>
             </div>
-            {(errorTop || errorTrending || errorStats) && (
+            {(errorFirebase || errorStats) && (
               <div className="mt-3 text-red-400 text-xs">
-                <p>Errors: {errorTop || errorTrending || errorStats}</p>
+                <p>Errors: {errorFirebase || errorStats}</p>
               </div>
             )}
           </div>

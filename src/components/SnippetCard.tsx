@@ -85,17 +85,49 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
       console.warn('Failed to track download:', error);
     }
   };
-
   // Get code object with fallbacks
   const getCodeObject = () => {
     const code = getSnippetProperty('code');
     if (typeof code === 'string') {
-      // If code is a string, try to parse it as HTML/CSS/JS
-      return {
-        html: code.includes('<') ? code : '',
-        css: code.includes('{') && code.includes(':') ? code : '',
-        javascript: code.includes('function') || code.includes('=>') || code.includes('var') || code.includes('let') || code.includes('const') ? code : ''
-      };
+      // Parse Firebase format: HTML\n\n/* CSS */\nCSS\n\n/* JavaScript */\nJS
+      const cssMarker = '/* CSS */';
+      const jsMarker = '/* JavaScript */';
+      
+      const cssIndex = code.indexOf(cssMarker);
+      const jsIndex = code.indexOf(jsMarker);
+      
+      let html = '';
+      let css = '';
+      let javascript = '';
+      
+      if (cssIndex !== -1 && jsIndex !== -1) {
+        // All three sections present
+        html = code.substring(0, cssIndex).trim();
+        css = code.substring(cssIndex + cssMarker.length, jsIndex).trim();
+        javascript = code.substring(jsIndex + jsMarker.length).trim();
+      } else if (cssIndex !== -1) {
+        // HTML and CSS sections
+        html = code.substring(0, cssIndex).trim();
+        css = code.substring(cssIndex + cssMarker.length).trim();
+      } else if (jsIndex !== -1) {
+        // HTML and JavaScript sections
+        html = code.substring(0, jsIndex).trim();
+        javascript = code.substring(jsIndex + jsMarker.length).trim();
+      } else {
+        // Single section - try to detect type
+        if (code.includes('<') && (code.includes('html') || code.includes('div') || code.includes('body'))) {
+          html = code;
+        } else if (code.includes('{') && code.includes(':') && (code.includes('color') || code.includes('background') || code.includes('margin'))) {
+          css = code;
+        } else if (code.includes('function') || code.includes('=>') || code.includes('var') || code.includes('let') || code.includes('const')) {
+          javascript = code;
+        } else {
+          // Default to HTML if unsure
+          html = code;
+        }
+      }
+      
+      return { html, css, javascript };
     }
     return code || { html: '', css: '', javascript: '' };
   };
@@ -114,10 +146,15 @@ const SnippetCard = ({ snippet }: SnippetCardProps) => {
       isPro: false
     };
   };
-
   // Get category with fallback
   const getCategory = () => {
-    return getSnippetProperty('category') || getSnippetProperty('language') || 'javascript';
+    const category = getSnippetProperty('category');
+    // Handle new hierarchical category structure
+    if (category && typeof category === 'object' && category.id) {
+      return category.id;
+    }
+    // Fallback to old format or language field
+    return category || getSnippetProperty('language') || 'javascript';
   };
 
   // Get thumbnail URL with fallback

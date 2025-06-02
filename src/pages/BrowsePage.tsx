@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Grid, List } from 'lucide-react';
 import SnippetCard from '../components/SnippetCard.tsx';
 import { snippetsData } from '../data/snippets';
+import { useFirebaseSnippets } from '../hooks/useFirebaseData';
 
 const BrowsePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,7 +11,31 @@ const BrowsePage = () => {
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const allSnippets = Object.values(snippetsData); // Centralized data
+    // Get Firebase snippets (user uploaded)
+  const { snippets: firebaseSnippets } = useFirebaseSnippets({
+    orderByField: 'createdAt',
+    orderDirection: 'desc',
+    limitCount: 50,
+    realtime: true
+  });
+  
+  // Combine Firebase snippets with mock data
+  const [allSnippets, setAllSnippets] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const mockSnippetsArray = Object.values(snippetsData);
+    const combinedSnippets = [
+      ...firebaseSnippets,
+      ...mockSnippetsArray
+    ];
+    
+    // Remove duplicates based on ID
+    const uniqueSnippets = combinedSnippets.filter((snippet, index, self) => 
+      index === self.findIndex(s => s.id === snippet.id)
+    );
+    
+    setAllSnippets(uniqueSnippets);
+  }, [firebaseSnippets]);
   const categories = [
     { id: 'all', label: 'All Categories' },
     { id: 'css', label: 'CSS' },
@@ -30,14 +55,23 @@ const BrowsePage = () => {
     { id: 'views', label: 'Most Viewed' },
     { id: 'likes', label: 'Most Liked' }
   ];
-
+  // Helper function to get category from snippet
+  const getSnippetCategory = (snippet: any) => {
+    // Handle new hierarchical category structure
+    if (snippet.category && typeof snippet.category === 'object' && snippet.category.id) {
+      return snippet.category.id;
+    }
+    // Fallback to old format or language field
+    return snippet.category || snippet.language || 'javascript';
+  };
   // Filter snippets based on search and filters
   const filteredSnippets = allSnippets.filter(snippet => {
     const matchesSearch = snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          snippet.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         snippet.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                         snippet.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    const matchesCategory = selectedCategory === 'all' || snippet.category === selectedCategory;
+    const snippetCategory = getSnippetCategory(snippet);
+    const matchesCategory = selectedCategory === 'all' || snippetCategory === selectedCategory;
     const matchesTag = selectedTag === 'all' || snippet.tags.includes(selectedTag);
     
     return matchesSearch && matchesCategory && matchesTag;
@@ -47,15 +81,27 @@ const BrowsePage = () => {
   const sortedSnippets = [...filteredSnippets].sort((a, b) => {
     switch (sortBy) {
       case 'popular':
-        return b.stats.likes - a.stats.likes;
+        const aLikes = a.stats?.likes || a.metrics?.likes || a.analytics?.likes || 0;
+        const bLikes = b.stats?.likes || b.metrics?.likes || b.analytics?.likes || 0;
+        return bLikes - aLikes;
       case 'views':
-        return b.stats.views - a.stats.views;
+        const aViews = a.stats?.views || a.metrics?.views || a.analytics?.views || 0;
+        const bViews = b.stats?.views || b.metrics?.views || b.analytics?.views || 0;
+        return bViews - aViews;
       case 'likes':
-        return b.stats.likes - a.stats.likes;
+        const aLikesSort = a.stats?.likes || a.metrics?.likes || a.analytics?.likes || 0;
+        const bLikesSort = b.stats?.likes || b.metrics?.likes || b.analytics?.likes || 0;
+        return bLikesSort - aLikesSort;
       default:
-        return 0; // Recent would need timestamp
+        // For recent, prioritize Firebase snippets (they have createdAt timestamps)
+        if (a.createdAt && b.createdAt) {
+          return new Date(b.createdAt.seconds * 1000).getTime() - new Date(a.createdAt.seconds * 1000).getTime();
+        }
+        if (a.createdAt && !b.createdAt) return -1;
+        if (!a.createdAt && b.createdAt) return 1;
+        return 0;
     }
-  });  return (
+  });return (
     <div className="min-h-screen">
       <div className="pt-8">
         {/* Header */}

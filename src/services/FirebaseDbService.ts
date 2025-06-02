@@ -261,14 +261,13 @@ export class FirebaseDbService {
     type: UserInteraction['type'],
     metadata?: Record<string, any>
   ): Promise<void> {
-    try {
-      // Create interaction record
+    try {      // Create interaction record
       const interaction: Omit<UserInteraction, 'id'> = {
         userId,
         snippetId,
         type,
         timestamp: serverTimestamp(),
-        metadata
+        metadata: metadata || {}
       };
 
       await addDoc(collection(db, COLLECTIONS.INTERACTIONS), interaction);
