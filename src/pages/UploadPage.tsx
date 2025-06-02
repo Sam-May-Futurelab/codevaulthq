@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Editor } from '@monaco-editor/react';
-import { Play, Eye, Save, Upload, Tag, Palette, Code2, FileImage, RefreshCw } from 'lucide-react';
+import { Play, Eye, Save, Upload, Tag, Palette, Code2, FileImage, RefreshCw, Layout, Settings, Sparkles } from 'lucide-react';
 import FirebaseDbService from '../services/FirebaseDbService';
 import { useAuth } from '../hooks/useAuth.tsx';
 import AuthModal from '../components/AuthModal';
@@ -20,11 +20,10 @@ interface SnippetData {
 const UploadPage = () => {
   const { currentUser } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  
-  const [snippetData, setSnippetData] = useState<SnippetData>({
+    const [snippetData, setSnippetData] = useState<SnippetData>({
     title: '',
     description: '',
-    category: 'css',
+    category: 'animations',
     tags: [],
     htmlCode: '<!-- Your HTML code here -->\n<div class="container">\n  <h1>Hello World</h1>\n</div>',
     cssCode: '/* Your CSS code here */\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  font-family: Arial, sans-serif;\n}\n\nh1 {\n  color: #00ff88;\n  animation: glow 2s ease-in-out infinite alternate;\n}\n\n@keyframes glow {\n  from { text-shadow: 0 0 20px #00ff88; }\n  to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }\n}',
@@ -67,7 +66,71 @@ const UploadPage = () => {
         clearTimeout(updateTimeoutRef.current);
       }
     };
-  }, [snippetData.htmlCode, snippetData.cssCode, snippetData.jsCode, debouncedUpdatePreview]);
+  }, [snippetData.htmlCode, snippetData.cssCode, snippetData.jsCode, debouncedUpdatePreview]);  // Hierarchical category structure
+  const categoryStructure = {
+    essentials: {
+      name: 'Essential Components',
+      icon: Code2,
+      color: 'text-blue-600',
+      subcategories: [
+        { id: 'ui-components', label: 'UI Components' },
+        { id: 'forms', label: 'Forms & Inputs' },
+        { id: 'navigation', label: 'Navigation' },
+        { id: 'buttons', label: 'Buttons & CTAs' },
+        { id: 'modals', label: 'Modals & Dialogs' }
+      ]
+    },
+    visual: {
+      name: 'Visual & Animation',
+      icon: Palette,
+      color: 'text-pink-500',
+      subcategories: [
+        { id: 'animations', label: 'Animations' },
+        { id: 'transitions', label: 'Transitions' },
+        { id: 'backgrounds', label: 'Background Effects' },
+        { id: 'text-effects', label: 'Text Effects' },
+        { id: 'loaders', label: 'Loading Indicators' }
+      ]
+    },
+    layout: {
+      name: 'Layout & Structure',
+      icon: Layout,
+      color: 'text-green-500',
+      subcategories: [
+        { id: 'grid-systems', label: 'Grid & Flexbox' },
+        { id: 'responsive', label: 'Responsive Design' },
+        { id: 'cards', label: 'Cards & Containers' },
+        { id: 'heroes', label: 'Hero Sections' },
+        { id: 'page-sections', label: 'Page Sections' }
+      ]
+    },
+    interactive: {
+      name: 'Interactive & Dynamic',
+      icon: Settings,
+      color: 'text-orange-500',
+      subcategories: [
+        { id: 'data-display', label: 'Data Visualization' },
+        { id: 'interactive', label: 'Interactive Demos' },
+        { id: 'games', label: 'Games & Playful' },
+        { id: 'api', label: 'API Integration' },
+        { id: 'auth', label: 'Authentication' }
+      ]
+    },
+    advanced: {
+      name: 'Advanced & Experimental',
+      icon: Sparkles,
+      color: 'text-purple-500',
+      subcategories: [
+        { id: 'canvas', label: 'Canvas & Graphics' },
+        { id: 'webgl', label: 'WebGL & 3D' },
+        { id: 'svg', label: 'SVG Animations' },
+        { id: 'performance', label: 'Performance' },
+        { id: 'accessibility', label: 'Accessibility' }
+      ]
+    }
+  };
+
+  // Legacy categories for backward compatibility
   const categories = [
     { id: 'ui-components', label: 'UI Components', icon: Code2, color: 'text-blue-400' },
     { id: 'animations', label: 'Animations', icon: Play, color: 'text-purple-400' },
