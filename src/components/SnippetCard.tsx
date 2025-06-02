@@ -191,16 +191,27 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
     react: '⚛️',
     vue: '💚',
     animation: '✨'
-  };
-  return (
-    <motion.div
-      className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-[400px] flex flex-col"
-      style={{ 
-        height: '480px', 
+  };  return (
+    <div 
+      className="w-full"
+      style={{
+        width: '100%',
+        maxWidth: '400px',
+        height: '480px',
         minHeight: '480px',
-        maxHeight: '480px' 
+        maxHeight: '480px',
+        margin: '0 auto'
       }}
     >
+      <motion.div
+        className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 flex flex-col"
+        style={{ 
+          width: '100%',
+          height: '100%',
+          minHeight: '100%',
+          maxHeight: '100%'
+        }}
+      >
       {/* DEDICATED LIVE PREVIEW SECTION - Exactly 260px height */}
       <div 
         className="relative bg-gradient-to-br from-vault-dark to-vault-medium overflow-hidden flex-shrink-0"
@@ -420,10 +431,10 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
                 View Code
               </Link>
             )}
-          </div>
-        </div>
+          </div>        </div>
       </div>
     </motion.div>
+    </div>
   );
 };
 

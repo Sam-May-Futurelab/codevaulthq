@@ -775,7 +775,7 @@ a[href*="/snippet/"]:hover {
     0 0 30px rgba(14, 165, 233, 0.2);
 }
 
-/* Better grid layouts with FIXED card sizes */
+/* Better grid layouts with FIXED card sizes - SIMPLIFIED */
 .snippet-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -783,51 +783,27 @@ a[href*="/snippet/"]:hover {
   justify-content: center;
 }
 
-/* FORCE consistent card dimensions - EXTRA STRONG */
+/* SIMPLE FORCE: All cards must be exactly this size */
 .snippet-grid > * {
-  height: 480px !important; /* Fixed total card height - increased from 420px */
-  min-height: 480px !important;
-  max-height: 480px !important;
-  max-width: 400px;
-  margin: 0 auto;
-  overflow: hidden; /* Prevent content from expanding card */
-}
-
-/* Force consistent card dimensions specifically for SnippetCard components */
-.snippet-grid .bg-vault-medium {
+  width: 100% !important;
+  max-width: 400px !important;
   height: 480px !important;
   min-height: 480px !important;
   max-height: 480px !important;
-  overflow: hidden !important;
+  margin: 0 auto !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
 }
 
-/* Ensure iframe previews don't affect card dimensions */
-.snippet-grid iframe {
-  max-height: 260px !important;
-  overflow: hidden !important;
-}
-
-/* Force preview container to maintain fixed height */
-.snippet-grid .relative {
-  height: 260px !important;
-  min-height: 260px !important;
-  max-height: 260px !important;
-  overflow: hidden !important;
-}
-
-/* Mobile responsive card sizing */
+/* Mobile: Keep it simple and consistent */
 @media (max-width: 768px) {
   .snippet-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   .snippet-grid > * {
-    height: 440px !important; /* Slightly smaller on mobile - increased from 380px */
-    min-height: 440px !important;
-    max-height: 440px !important;
-    overflow: hidden !important;
-  }
-  .snippet-grid .bg-vault-medium {
+    width: 100% !important;
     height: 440px !important;
     min-height: 440px !important;
     max-height: 440px !important;
@@ -840,12 +816,7 @@ a[href*="/snippet/"]:hover {
     gap: 1rem;
   }
   .snippet-grid > * {
-    height: 420px !important; /* Even smaller on small mobile - increased from 360px */
-    min-height: 420px !important;
-    max-height: 420px !important;
-    overflow: hidden !important;
-  }
-  .snippet-grid .bg-vault-medium {
+    width: 100% !important;
     height: 420px !important;
     min-height: 420px !important;
     max-height: 420px !important;
