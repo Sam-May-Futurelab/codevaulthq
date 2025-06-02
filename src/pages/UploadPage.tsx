@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -570,14 +571,13 @@ const UploadPage = () => {
                     >
                       <div className="flex items-center space-x-3">
                         {snippetData.category ? (
-                          <>
-                            {(() => {
+                          <>                            {(() => {
                               // Find the selected category details
                               for (const [mainKey, mainCategory] of Object.entries(categoryStructure)) {
                                 const subcat = mainCategory.subcategories.find(sub => sub.id === snippetData.category);
                                 if (subcat) {
                                   return (
-                                    <>
+                                    <React.Fragment key={subcat.id}>
                                       <div 
                                         className="w-4 h-4 rounded-full shadow-sm"
                                         style={{
@@ -590,7 +590,7 @@ const UploadPage = () => {
                                       <span className="text-sm text-gray-500">
                                         in {mainCategory.name}
                                       </span>
-                                    </>
+                                    </React.Fragment>
                                   );
                                 }
                               }
@@ -636,9 +636,6 @@ const UploadPage = () => {
                               >                                <div className="flex items-center">
                                   <mainCategory.icon className="w-5 h-5 mr-3" style={{ color: '#374151' }} />
                                   <span style={{ color: '#374151' }}>{mainCategory.name}</span>
-                                  <span className="ml-2 text-xs bg-white/50 px-2 py-1 rounded-full" style={{ color: '#6b7280' }}>
-                                    {mainCategory.subcategories.length}
-                                  </span>
                                 </div>
                                 <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} style={{ color: '#374151' }}>
                                   ▼
@@ -665,13 +662,13 @@ const UploadPage = () => {
                                         }`}
                                         style={{ color: isSelected ? '#065f46' : '#374151' }}
                                       >
-                                        <div className="flex items-center space-x-3">
-                                          <div 
+                                        <div className="flex items-center space-x-3">                                          <div 
                                             className="w-3 h-3 rounded-full opacity-60 group-hover:opacity-100 shadow-sm"
                                             style={{
                                               background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
                                             }}
-                                          />                                          <span className={`${isSelected ? 'text-green-700' : 'text-gray-700'}`} style={{ color: isSelected ? '#065f46' : '#374151' }}>
+                                          />
+                                          <span className={`${isSelected ? 'text-green-700' : 'text-gray-700'}`} style={{ color: isSelected ? '#065f46' : '#374151' }}>
                                             {subcat.label}
                                           </span>
                                         </div>
