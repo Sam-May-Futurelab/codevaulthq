@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { Code, Users, Download, Star, Heart, Eye, ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Code, Users, Download, Star, Code2, Palette, Layout, Settings, Sparkles } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import ThreeHero from '../components/ThreeHero.tsx';
 import SnippetCard from '../components/SnippetCard.tsx';
@@ -15,6 +15,71 @@ const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const [isSeeding, setIsSeeding] = useState(false);
+  const navigate = useNavigate();
+  
+  // Hierarchical category structure
+  const categoryStructure = {
+    essentials: {
+      name: 'Essential Components',
+      icon: Code2,
+      color: 'text-blue-600',
+      subcategories: [
+        { id: 'ui-components', label: 'UI Components' },
+        { id: 'forms', label: 'Forms & Inputs' },
+        { id: 'navigation', label: 'Navigation' },
+        { id: 'buttons', label: 'Buttons & CTAs' },
+        { id: 'modals', label: 'Modals & Dialogs' }
+      ]
+    },
+    visual: {
+      name: 'Visual & Animation',
+      icon: Palette,
+      color: 'text-pink-500',
+      subcategories: [
+        { id: 'animations', label: 'Animations' },
+        { id: 'transitions', label: 'Transitions' },
+        { id: 'backgrounds', label: 'Background Effects' },
+        { id: 'text-effects', label: 'Text Effects' },
+        { id: 'loaders', label: 'Loading Indicators' }
+      ]
+    },
+    layout: {
+      name: 'Layout & Structure',
+      icon: Layout,
+      color: 'text-green-500',
+      subcategories: [
+        { id: 'grid-systems', label: 'Grid & Flexbox' },
+        { id: 'responsive', label: 'Responsive Design' },
+        { id: 'cards', label: 'Cards & Containers' },
+        { id: 'heroes', label: 'Hero Sections' },
+        { id: 'page-sections', label: 'Page Sections' }
+      ]
+    },
+    interactive: {
+      name: 'Interactive & Dynamic',
+      icon: Settings,
+      color: 'text-orange-500',
+      subcategories: [
+        { id: 'data-display', label: 'Data Visualization' },
+        { id: 'interactive', label: 'Interactive Demos' },
+        { id: 'games', label: 'Games & Playful' },
+        { id: 'api', label: 'API Integration' },
+        { id: 'auth', label: 'Authentication' }
+      ]
+    },
+    advanced: {
+      name: 'Advanced & Experimental',
+      icon: Sparkles,
+      color: 'text-purple-500',
+      subcategories: [
+        { id: 'canvas', label: 'Canvas & Graphics' },
+        { id: 'webgl', label: 'WebGL & 3D' },
+        { id: 'svg', label: 'SVG Animations' },
+        { id: 'performance', label: 'Performance' },
+        { id: 'accessibility', label: 'Accessibility' }
+      ]
+    }
+  };
   
   // Get Firebase snippets (user uploaded)
   const { snippets: firebaseSnippets, loading: loadingFirebase, error: errorFirebase } = useFirebaseSnippets({
@@ -130,53 +195,7 @@ const HomePage = () => {
 
     return () => {
       cleanupFunctions.forEach(cleanup => cleanup());
-    };
-  }, [platformStats, loadingStats]);
-
-  // Helper to get likes/views for all snippet types
-const getLikes = (snippet: any) => {
-  if (snippet.metrics) return snippet.metrics.likes;
-  if (snippet.analytics && snippet.analytics.likes !== undefined) return snippet.analytics.likes;
-  if (snippet.analytics && snippet.analytics.metrics) return snippet.analytics.metrics.likes;
-  return snippet.likes || 0;
-};
-const getViews = (snippet: any) => {
-  if (snippet.metrics) return snippet.metrics.views;
-  if (snippet.analytics && snippet.analytics.views !== undefined) return snippet.analytics.views;
-  if (snippet.analytics && snippet.analytics.metrics) return snippet.analytics.metrics.views;
-  return snippet.views || 0;
-};
-const getCategory = (snippet: any) => {
-  // Handle new hierarchical category structure
-  if (snippet.category && typeof snippet.category === 'object' && snippet.category.id) {
-    return snippet.category.id;
-  }
-  // Fallback to old format or language field
-  return snippet.category || snippet.language || 'javascript';
-};
-
-  // Category colors for consistency
-  const categoryColors = {
-    css: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
-    javascript: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
-    html: 'bg-orange-500/20 text-orange-300 border-orange-400/30',
-    canvas: 'bg-purple-500/20 text-purple-300 border-purple-400/30',
-    webgl: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-    react: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
-    vue: 'bg-green-500/20 text-green-300 border-green-400/30',
-    animation: 'bg-pink-500/20 text-pink-300 border-pink-400/30'
-  };
-  
-  const categoryIcons = {
-    css: '🎨',
-    javascript: '⚡',
-    html: '🌐',
-    canvas: '🖼️',
-    webgl: '🎮',
-    react: '⚛️',
-    vue: '💚',
-    animation: '✨'
-  };
+    };  }, [platformStats, loadingStats]);
 
   const stats = [
     { 
@@ -369,10 +388,8 @@ const getCategory = (snippet: any) => {
               </Link>
             </motion.div>
           </div>
-        </section>
-
-        {/* Top 10 of the Month - Horizontal Scroll Carousel */}
-        <section className="top10-section py-32 bg-gradient-to-r from-vault-purple/10 via-transparent to-vault-accent/10 my-24">
+        </section>        {/* Browse by Category Section */}
+        <section className="category-section py-32 bg-gradient-to-r from-vault-purple/10 via-transparent to-vault-accent/10 my-24">
           <div className="px-6 sm:px-8 lg:px-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -381,78 +398,63 @@ const getCategory = (snippet: any) => {
               className="text-center mb-20"
             >
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 font-display">
-                🏆 Top 10 <span className="text-vault-purple">of the Month</span>
+                Browse by <span className="text-vault-purple">Category</span>
               </h2>
               <p className="text-lg text-gray-400 mb-6">
-                The most impressive snippets developers are talking about
+                Discover code snippets organized by functionality and purpose
               </p>
               <p className="text-sm text-vault-purple font-code">
-                🚀 Ranked by community engagement and creativity
+                🎯 Find exactly what you need with our curated categories
               </p>
-            </motion.div>            {/* Horizontal Scroll Container */}
-            <div className="relative">              {loadingFirebase ? (
-                <div className="text-center py-12">
-                  <div className="text-vault-purple text-lg">Loading top snippets...</div>
-                </div>
-              ) : (
-                <div className="flex overflow-x-auto pb-6 scrollbar-thin scrollbar-track-vault-dark scrollbar-thumb-vault-accent/50" style={{paddingLeft: '24px', paddingRight: '24px'}}>
-                  {displayTopSnippets.map((snippet: any, index: number) => (
+            </motion.div>            {/* Category Grid - Compact Layout */}
+            <div className="max-w-5xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {Object.entries(categoryStructure).map(([key, category], index) => {
+                  const IconComponent = category.icon;
+                  return (
                     <motion.div
-                      key={`top10-${snippet.id}-${index}`}
+                      key={key}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
-                      className="flex-shrink-0 w-80 top10-item"
-                      style={{marginRight: index < displayTopSnippets.length - 1 ? '24px' : '0'}}
+                      className="interactive-card bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-4 hover:border-vault-purple/50 transition-all duration-300 group cursor-pointer hover:scale-105"
+                      onClick={() => navigate(`/browse?category=${key}`)}
                     >
-                      <div className="interactive-card relative bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-4 hover:border-vault-purple/50 transition-all duration-300 group">
-                        <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-vault-purple to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {index + 1}
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-vault-purple/20 to-vault-accent/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <IconComponent className={`w-6 h-6 ${category.color}`} />
                         </div>
+                        <h3 className="text-white font-semibold text-sm group-hover:text-vault-purple transition-colors mb-2 leading-tight">
+                          {category.name}
+                        </h3>
+                        <p className="text-gray-400 text-xs mb-3">
+                          {category.subcategories.length} categories
+                        </p>
                         
-                        <div className="flex items-center space-x-3 mb-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-vault-purple/20 to-vault-accent/20 rounded-lg flex items-center justify-center">
-                            <ExternalLink className="w-6 h-6 text-vault-purple" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-white font-semibold line-clamp-1">{snippet.title}</h3>
-                            <p className="text-gray-400 text-xs line-clamp-1">{snippet.description}</p>
-                          </div>
-                        </div>
-                          <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center space-x-2 text-gray-400">
-                            <Heart className="w-4 h-4" />
-                            <span>
-                              {getLikes(snippet)}
-                            </span>
-                            <Eye className="w-4 h-4 ml-2" />
-                            <span>
-                              {getViews(snippet)}
-                            </span>
-                          </div>
-                          <span 
-                            className={`px-2 py-1 rounded-md text-xs font-medium ${
-                              categoryColors[getCategory(snippet) as keyof typeof categoryColors] || 
-                              'bg-gray-500/20 text-gray-300 border-gray-400/30'
-                            }`}
-                            style={{
-                              backdropFilter: 'blur(16px)',
-                              background: 'rgba(255, 255, 255, 0.1)',
-                              border: '1px solid rgba(255, 255, 255, 0.2)',
-                              borderRadius: '8px'
-                            }}
-                          >
-                            <span className="mr-1">
-                              {categoryIcons[getCategory(snippet) as keyof typeof categoryIcons] || '📄'}
-                            </span>
-                            {getCategory(snippet).toUpperCase()}
-                          </span>
+                        {/* Show top 2 subcategories as tags */}
+                        <div className="space-y-1">
+                          {category.subcategories.slice(0, 2).map((sub) => (
+                            <div
+                              key={sub.id}
+                              className="text-xs text-vault-purple/70 bg-vault-purple/10 rounded px-2 py-1 hover:bg-vault-purple/20 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/browse?category=${sub.id}`);
+                              }}
+                            >
+                              {sub.label}
+                            </div>
+                          ))}
+                          {category.subcategories.length > 2 && (
+                            <div className="text-xs text-gray-500">
+                              +{category.subcategories.length - 2} more
+                            </div>
+                          )}
                         </div>
                       </div>
                     </motion.div>
-                  ))}
-                </div>
-              )}
+                  );                })}
+              </div>
             </div>
           </div>
         </section>
