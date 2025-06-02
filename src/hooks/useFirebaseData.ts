@@ -86,12 +86,20 @@ export const useCreateSnippet = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
-
   const createSnippet = useCallback(async (snippetData: {
     title: string;
     description: string;
     code: string;
     language: string;
+    category?: {
+      id: string;
+      label: string;
+      mainCategory: {
+        id: string;
+        name: string;
+        color: string;
+      };
+    };
     tags: string[];
     isPublic: boolean;
   }) => {
@@ -103,8 +111,20 @@ export const useCreateSnippet = () => {
       setLoading(true);
       setError(null);
 
+      // Create default category if not provided (for backward compatibility)
+      const category = snippetData.category || {
+        id: snippetData.language || 'animations',
+        label: snippetData.language || 'Animations',
+        mainCategory: {
+          id: 'visual',
+          name: 'Visual & Animation',
+          color: 'text-pink-500'
+        }
+      };
+
       const snippetId = await FirebaseDbService.createSnippet({
         ...snippetData,
+        category,
         authorId: currentUser.uid,
         authorName: currentUser.displayName || 'Anonymous'
       });

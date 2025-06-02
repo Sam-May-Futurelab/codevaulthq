@@ -427,6 +427,72 @@ export class FirebaseDbService {
     }
   }
 
+  // Enhanced query methods for hierarchical categories
+  static async getSnippetsByMainCategory(mainCategoryId: string, limitCount: number = 20): Promise<FirestoreSnippet[]> {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.SNIPPETS),
+        where('category.mainCategory.id', '==', mainCategoryId),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map(doc => {
+        const rawData = { id: doc.id, ...doc.data() };
+        return this.normalizeCategoryData(rawData);
+      });
+    } catch (error) {
+      console.error('Error fetching snippets by main category:', error);
+      return [];
+    }
+  }
+
+  static async getSnippetsBySubcategory(subcategoryId: string, limitCount: number = 20): Promise<FirestoreSnippet[]> {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.SNIPPETS),
+        where('category.id', '==', subcategoryId),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map(doc => {
+        const rawData = { id: doc.id, ...doc.data() };
+        return this.normalizeCategoryData(rawData);
+      });
+    } catch (error) {
+      console.error('Error fetching snippets by subcategory:', error);
+      return [];
+    }
+  }
+
+  // Get category statistics
+  static async getCategoryStatistics(): Promise<Record<string, { mainCategory: string; count: number; }>> {
+    try {
+      const allSnippets = await this.getSnippets({ limitCount: 1000 });
+      const stats: Record<string, { mainCategory: string; count: number; }> = {};
+      
+      allSnippets.forEach(snippet => {
+        if (snippet.category?.id) {
+          if (!stats[snippet.category.id]) {
+            stats[snippet.category.id] = {
+              mainCategory: snippet.category.mainCategory.name,
+              count: 0
+            };
+          }
+          stats[snippet.category.id].count++;
+        }
+      });
+      
+      return stats;
+    } catch (error) {
+      console.error('Error getting category statistics:', error);
+      return {};
+    }
+  }
+
   // Helper function to ensure category compatibility
   static normalizeCategoryData(snippet: any): FirestoreSnippet {
     // If the snippet has the old format (only language field), convert it

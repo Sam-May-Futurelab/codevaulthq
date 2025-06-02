@@ -484,6 +484,68 @@ export default {
 ];
 
 export class DataSeeder {
+  static getCategoryFromLanguage(language: string) {
+    // Define mapping from language to category
+    const categoryMapping: Record<string, any> = {
+      javascript: {
+        id: 'javascript',
+        label: 'JavaScript',
+        mainCategory: {
+          id: 'frontend',
+          name: 'Frontend Development',
+          color: 'text-yellow-500'
+        }
+      },
+      css: {
+        id: 'css',
+        label: 'CSS',
+        mainCategory: {
+          id: 'visual',
+          name: 'Visual & Animation',
+          color: 'text-pink-500'
+        }
+      },
+      react: {
+        id: 'react',
+        label: 'React',
+        mainCategory: {
+          id: 'frontend',
+          name: 'Frontend Development',
+          color: 'text-blue-500'
+        }
+      },
+      webgl: {
+        id: 'webgl',
+        label: 'WebGL',
+        mainCategory: {
+          id: 'visual',
+          name: 'Visual & Animation',
+          color: 'text-purple-500'
+        }
+      },
+      vue: {
+        id: 'vue',
+        label: 'Vue',
+        mainCategory: {
+          id: 'frontend',
+          name: 'Frontend Development',
+          color: 'text-green-500'
+        }
+      }
+    };
+
+    // Return the appropriate category or a default one
+    return categoryMapping[language] || {
+      id: language || 'misc',
+      label: language ? language.charAt(0).toUpperCase() + language.slice(1) : 'Miscellaneous',
+      mainCategory: {
+        id: 'other',
+        name: 'Other',
+        color: 'text-gray-500'
+      }
+    };
+  }
+
   static async seedDatabase() {
     try {
       console.log('🌱 Seeding database with sample snippets...');
@@ -491,7 +553,13 @@ export class DataSeeder {
       const results = [];
       for (const snippet of mockSnippets) {
         try {
-          const snippetId = await FirebaseDbService.createSnippet(snippet);
+          // Add category property based on language for backward compatibility
+          const enrichedSnippet = {
+            ...snippet,
+            category: this.getCategoryFromLanguage(snippet.language)
+          };
+          
+          const snippetId = await FirebaseDbService.createSnippet(enrichedSnippet);
           console.log(`✅ Created snippet: ${snippet.title} (ID: ${snippetId})`);
           results.push(snippetId);
         } catch (error) {
