@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Editor } from '@monaco-editor/react';
-import { Play, Eye, Save, Upload, Tag, Palette, Code2, FileImage, RefreshCw, Layout, Settings, Sparkles } from 'lucide-react';
+import { Play, Eye, Save, Upload, Tag, Palette, Code2, FileImage, RefreshCw, Layout, Settings, Sparkles, Trash2 } from 'lucide-react';
 import FirebaseDbService from '../services/FirebaseDbService';
 import { useAuth } from '../hooks/useAuth.tsx';
 import AuthModal from '../components/AuthModal';
@@ -21,16 +21,15 @@ interface SnippetData {
 const UploadPage = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [snippetData, setSnippetData] = useState<SnippetData>({
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);    const [snippetData, setSnippetData] = useState<SnippetData>({
     title: '',
     description: '',
     category: 'animations',
     tags: [],
-    htmlCode: '<!-- Your HTML code here -->\n<div class="container">\n  <h1>Hello World</h1>\n</div>',
-    cssCode: '/* Your CSS code here */\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  font-family: Arial, sans-serif;\n}\n\nh1 {\n  color: #00ff88;\n  animation: glow 2s ease-in-out infinite alternate;\n}\n\n@keyframes glow {\n  from { text-shadow: 0 0 20px #00ff88; }\n  to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }\n}',
-    jsCode: '// Your JavaScript code here\nconsole.log("Hello from Code Vault HQ!");\n\n// Add some interactivity\ndocument.addEventListener("DOMContentLoaded", function() {\n  const container = document.querySelector(".container");\n  \n  container.addEventListener("click", function() {\n    this.style.transform = this.style.transform === "scale(1.1)" ? "scale(1)" : "scale(1.1)";\n  });\n});'
-  });  const [activeTab, setActiveTab] = useState<'html' | 'css' | 'js'>('css');
+    htmlCode: '<!-- Your HTML code here -->\n<!-- Examples: -->\n<!-- <div class="container"> -->\n<!-- <h1>Your Heading</h1> -->\n<!-- </div> -->\n',
+    cssCode: '/* Your CSS code here */\n/* Examples: */\n/* body { */\n/*   background-color: #f5f5f5; */\n/*   font-family: Arial, sans-serif; */\n/* } */\n',
+    jsCode: '// Your JavaScript code here\n// Examples:\n// document.addEventListener("DOMContentLoaded", function() {\n//   console.log("DOM loaded!");\n// });\n'
+  });const [activeTab, setActiveTab] = useState<'html' | 'css' | 'js'>('css');
   const [tagInput, setTagInput] = useState('');
   const [isPreviewUpdating, setIsPreviewUpdating] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -59,7 +58,6 @@ const UploadPage = () => {
   useEffect(() => {
     generatePreview();
   }, [activeTab]);
-
   // Auto-update preview when code changes
   useEffect(() => {
     debouncedUpdatePreview();
@@ -68,7 +66,43 @@ const UploadPage = () => {
         clearTimeout(updateTimeoutRef.current);
       }
     };
-  }, [snippetData.htmlCode, snippetData.cssCode, snippetData.jsCode, debouncedUpdatePreview]);  // Hierarchical category structure
+  }, [snippetData.htmlCode, snippetData.cssCode, snippetData.jsCode, debouncedUpdatePreview]);
+
+  // Global keyboard listener for Ctrl+S as backup
+  useEffect(() => {
+    const handleGlobalKeydown = (e: KeyboardEvent) => {
+      // Ctrl+S anywhere on the page
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        console.log('🌍 Global Ctrl+S detected - preventing default and updating preview');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Cancel any pending updates
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current);
+        }
+        
+        // Update preview immediately
+        generatePreview();
+        setLastSaved(new Date());
+        window.showToast?.('🌍 Global Ctrl+S: Preview updated!', 'success');
+      }
+      
+      // F5 for refresh (but allow default if not focused on editor)
+      if (e.key === 'F5' && document.activeElement?.closest('.monaco-editor')) {
+        console.log('🌍 Global F5 detected in editor');
+        e.preventDefault();
+        generatePreview();
+        setLastSaved(new Date());
+        window.showToast?.('🔄 F5: Preview refreshed!', 'success');
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeydown, true);
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeydown, true);
+    };
+  }, []);  // Hierarchical category structure
   const categoryStructure = {
     essentials: {
       name: 'Essential Components',
@@ -202,13 +236,26 @@ const UploadPage = () => {
     setIsColorPickerOpen(false);
     window.showToast?.('Color inserted into editor', 'success');
   };
-
   // Format the code in the editor
   const formatCode = () => {
     if (editorRef.current) {
       const editor = editorRef.current;
       editor.getAction('editor.action.formatDocument')?.run();
       window.showToast?.('Code formatted', 'success');
+    }
+  };  // Clear all code in the editors
+  const clearAllCode = () => {
+    // Add confirmation to prevent accidental clearing
+    if (window.confirm('Are you sure you want to clear all code? This cannot be undone.')) {
+      setSnippetData(prev => ({
+        ...prev,
+        htmlCode: '<!-- Your HTML code here -->\n<!-- Examples: -->\n<!-- <div class="container"> -->\n<!-- <h1>Your Heading</h1> -->\n<!-- </div> -->\n',
+        cssCode: '/* Your CSS code here */\n/* Examples: */\n/* body { */\n/*   background-color: #f5f5f5; */\n/*   font-family: Arial, sans-serif; */\n/* } */\n',
+        jsCode: '// Your JavaScript code here\n// Examples:\n// document.addEventListener("DOMContentLoaded", function() {\n//   console.log("DOM loaded!");\n// });\n'
+      }));
+      window.showToast?.('🗑️ All code editors cleared', 'success');
+      // Update preview immediately
+      setTimeout(() => generatePreview(), 100);
     }
   };
 
@@ -220,53 +267,79 @@ const UploadPage = () => {
       y: rect.top
     });
     setIsColorPickerOpen(true);
-  };
-
-  const generatePreview = () => {
+  };  const generatePreview = () => {
     console.log('Generating preview with active tab:', activeTab);
-    const previewHtml = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Preview</title>
-        <style>
-          body { margin: 0; padding: 20px; background: #0a0a0a; color: white; }
-          ${snippetData.cssCode}
-        </style>
-      </head>
-      <body>
-        ${snippetData.htmlCode}
-        <script>
-          ${snippetData.jsCode}
-        </script>
-      </body>
-      </html>
-    `;
+    
+    try {
+      // Create the HTML for the preview
+      const previewHtml = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>CodeVault Preview</title>
+          <style>
+            body { 
+              margin: 0; 
+              padding: 20px; 
+              background: #0a0a0a; 
+              color: white;
+              font-family: Arial, sans-serif;
+            }
+            ${snippetData.cssCode}
+          </style>
+        </head>
+        <body>
+          ${snippetData.htmlCode}
+          <script>
+            // Wrapped in try-catch to prevent errors from breaking the preview
+            try {
+              ${snippetData.jsCode}
+            } catch (error) {
+              console.error('JavaScript error:', error);
+            }
+          </script>
+        </body>
+        </html>
+      `;
 
-    if (previewRef.current) {
-      const blob = new Blob([previewHtml], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      previewRef.current.src = url;
-      console.log('Preview updated successfully');
-    } else {
-      console.error('Preview iframe reference not found');
+      if (previewRef.current) {
+        // Create a blob from the HTML
+        const blob = new Blob([previewHtml], { type: 'text/html' });
+        
+        // Create a new URL
+        const url = URL.createObjectURL(blob);
+        
+        // Set the source of the iframe
+        previewRef.current.src = url;
+        
+        // Log successful update
+        console.log('Preview updated with new content');
+      } else {
+        console.error('Preview iframe reference not found');
+      }
+    } catch (error) {
+      console.error('Error generating preview:', error);
     }
-  };  // Manual save function (for Ctrl+S and save button)
+  };// Manual save function (for the Update Now button)
   const handleManualSave = () => {
+    console.log('🔄 Manual save triggered');
+    
+    // Cancel any pending debounced updates
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
     }
-    setIsPreviewUpdating(true);
-    generatePreview();
-    setLastSaved(new Date());
-    setTimeout(() => setIsPreviewUpdating(false), 300);
     
-    // Show a success toast with keyboard shortcut acknowledgment
-    window.showToast?.('💾 Preview updated successfully!', 'success');
-  };
-  // Handle submission of the snippet
+    // Update preview immediately
+    generatePreview();
+    
+    // Update last saved timestamp
+    setLastSaved(new Date());
+    
+    // Show success message
+    window.showToast?.('💾 Preview updated', 'success');
+  };// Handle submission of the snippet
   const handleSubmit = async () => {
     try {
       console.log('Submitting snippet to Firebase:', snippetData);
@@ -287,6 +360,12 @@ const UploadPage = () => {
       }
         if (snippetData.description.length > 140) {
         window.showToast?.('Description cannot exceed 140 characters', 'error');
+        return;
+      }
+      
+      // Validate category selection
+      if (!snippetData.category) {
+        window.showToast?.('Please select a category for your snippet', 'error');
         return;
       }// Prepare snippet data for Firebase
       // Find the complete category information
@@ -332,16 +411,15 @@ const UploadPage = () => {
       
       console.log('✅ Snippet uploaded successfully! ID:', snippetId);
       window.showToast?.(`🎉 Snippet uploaded successfully! Redirecting to your profile...`, 'success');
-      
-      // Reset form
+        // Reset form
       setSnippetData({
         title: '',
         description: '',
         category: 'css',
         tags: [],
-        htmlCode: '<!-- Your HTML code here -->\n<div class="container">\n  <h1>Hello World</h1>\n</div>',
-        cssCode: '/* Your CSS code here */\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  font-family: Arial, sans-serif;\n}\n\nh1 {\n  color: #333;\n  font-size: 2rem;\n}',
-        jsCode: '// Your JavaScript code here\nconsole.log("Hello, Code Vault HQ!");\n\n// Add your interactive functionality\ndocument.querySelector("h1").addEventListener("click", function() {\n  this.style.color = "#0ea5e9";\n  console.log("Title clicked!");\n});'
+        htmlCode: '<!-- Your HTML code here -->\n',
+        cssCode: '/* Your CSS code here */\n',
+        jsCode: '// Your JavaScript code here\n'
       });
       
       // Redirect to profile page after a short delay to show success message
@@ -442,9 +520,12 @@ const UploadPage = () => {
                         : `📝 ${140 - snippetData.description.length} characters remaining`}
                     </div>
                   )}
-                </div><div>
-                  <label className="block text-base font-semibold text-gray-700 mb-4">
-                    Category
+                </div>                <div>
+                  <label className="block text-xl font-bold text-gray-700 mb-4">
+                    Category <span className="text-red-500">*</span>
+                    <span className="block text-sm text-gray-500 font-normal mt-2">
+                      Select a category that best matches your code snippet (required)
+                    </span>
                   </label>
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {categories.map((category) => (
@@ -569,8 +650,16 @@ const UploadPage = () => {
                         <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
                       </div>
                     )}
-                  </div>
-                    <div className="flex items-center space-x-4">
+                  </div>                    <div className="flex items-center space-x-4">
+                    <button
+                      onClick={clearAllCode}
+                      type="button"
+                      className="px-5 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-3 bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl hover:transform hover:scale-105"
+                      title="Clear All Code"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                      <span>Clear All</span>
+                    </button>
                     <button
                       onClick={handlePaletteClick}
                       type="button"
@@ -588,26 +677,25 @@ const UploadPage = () => {
                     >
                       <Code2 className="w-5 h-5" />
                       <span>Format</span>
-                    </button>
-                    <button
+                    </button>                    <button
                       onClick={handleManualSave}
                       disabled={isPreviewUpdating}
                       type="button"
-                      className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-3 shadow-lg hover:shadow-xl ${
+                      className={`px-8 py-4 rounded-2xl font-black text-xl transition-all duration-200 flex items-center space-x-4 shadow-2xl hover:shadow-3xl transform hover:scale-110 border-4 ${
                         isPreviewUpdating
-                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                          : 'bg-vault-accent hover:bg-green-600 text-white hover:transform hover:scale-105'
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
+                          : 'bg-gradient-to-r from-vault-accent to-green-500 hover:from-green-400 hover:to-green-600 text-white border-vault-accent hover:border-green-400 ring-4 ring-vault-accent/30 hover:ring-green-400/40'
                       }`}
                     >
                       {isPreviewUpdating ? (
                         <>
-                          <RefreshCw className="w-5 h-5 animate-spin" />
-                          <span>Updating...</span>
+                          <RefreshCw className="w-7 h-7 animate-spin" />
+                          <span>UPDATING...</span>
                         </>
                       ) : (
                         <>
-                          <Save className="w-5 h-5" />
-                          <span>Save & Preview</span>
+                          <Save className="w-7 h-7" />
+                          <span>💾 SAVE & PREVIEW</span>
                         </>
                       )}
                     </button>
@@ -691,22 +779,61 @@ const UploadPage = () => {
                         {editorLineNumbers === 'on' ? 'On' : 'Off'}
                       </button>
                     </div>
-                  </div>
-                    <div className="text-lg text-gray-600 bg-gray-100 px-6 py-4 rounded-xl border border-gray-200 shadow-md">
-                    <div className="space-y-2">
-                      <div>Press <kbd className="bg-white px-3 py-1 rounded-md text-sm font-mono border border-gray-300 shadow-sm">Ctrl+S</kbd> to save</div>
-                      <div>Press <kbd className="bg-white px-3 py-1 rounded-md text-sm font-mono border border-gray-300 shadow-sm">Ctrl+Shift+F</kbd> to format</div>
+                  </div>                    <div className="text-lg text-gray-600 bg-gradient-to-r from-blue-50 to-green-50 px-8 py-6 rounded-2xl border-2 border-blue-200 shadow-lg">
+                    <div className="space-y-3">
+                      <div className="text-xl font-bold text-blue-800 mb-3">⌨️ Keyboard Shortcuts:</div>
+                      <div className="flex items-center space-x-3">
+                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-blue-300 shadow-md font-bold">Ctrl+S</kbd>
+                        <span className="font-semibold">Update Preview</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-green-300 shadow-md font-bold">Ctrl+Enter</kbd>
+                        <span className="font-semibold">Quick Update</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-purple-300 shadow-md font-bold">F5</kbd>
+                        <span className="font-semibold">Refresh Preview</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-orange-300 shadow-md font-bold">Ctrl+Shift+F</kbd>
+                        <span className="font-semibold">Format Code</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Monaco Editor Container */}
+              </div>              {/* Monaco Editor Container */}
               <div className="h-[600px] relative bg-[#1e1e1e]">
                 <div className="absolute top-6 left-6 z-10">
                   <span className="bg-vault-accent text-white px-6 py-3 rounded-xl text-base font-bold shadow-lg">
                     Currently editing: {activeTab.toUpperCase()}
                   </span>
+                </div>
+                
+                {/* Floating Quick Update Button */}
+                <div className="absolute top-6 right-6 z-10">
+                  <button
+                    onClick={handleManualSave}
+                    disabled={isPreviewUpdating}
+                    type="button"
+                    className={`px-6 py-3 rounded-xl font-bold text-lg transition-all duration-200 flex items-center space-x-3 shadow-2xl hover:shadow-3xl transform hover:scale-110 border-3 ${
+                      isPreviewUpdating
+                        ? 'bg-gray-600 text-gray-300 cursor-not-allowed border-gray-500'
+                        : 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white border-green-400 ring-2 ring-white/50'
+                    }`}
+                    title="Quick Update Preview (Ctrl+S, Ctrl+Enter, or F5)"
+                  >
+                    {isPreviewUpdating ? (
+                      <>
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        <span>Updating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-5 h-5" />
+                        <span>⚡ Quick Update</span>
+                      </>
+                    )}
+                  </button>
                 </div><Editor
                   height="100%"
                   language={editorTabs.find(tab => tab.id === activeTab)?.language}
@@ -718,33 +845,85 @@ const UploadPage = () => {
                   onChange={(value) => handleCodeChange(value, editorTabs.find(tab => tab.id === activeTab)?.language || 'css')}                  onMount={(editor, monaco) => {
                     // Store editor reference for color picker
                     editorRef.current = editor;
-                    
-                    // Add Ctrl+S keyboard shortcut
+                      // Enhanced Ctrl+S keyboard shortcut with proper event handling
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-                      console.log('🎯 Ctrl+S pressed in Monaco Editor');
-                      handleManualSave();
-                      return true; // Event handled, prevent browser default
+                      console.log('🎯 Ctrl+S pressed in Monaco Editor - FIXED VERSION');
+                      
+                      // Prevent browser default save dialog
+                      if (window.event) {
+                        window.event.preventDefault();
+                        window.event.stopPropagation();
+                      }
+                      
+                      // Cancel any pending updates
+                      if (updateTimeoutRef.current) {
+                        clearTimeout(updateTimeoutRef.current);
+                      }
+                      
+                      // Update preview immediately
+                      generatePreview();
+                      
+                      // Update last saved timestamp
+                      setLastSaved(new Date());
+                      
+                      // Show success message
+                      window.showToast?.('🚀 Ctrl+S: Preview updated successfully!', 'success');
+                      
+                      return true; // Event handled
                     });
                     
-                    // Add additional shortcuts for enhanced user experience
+                    // Additional keyboard shortcuts for better accessibility
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => {
                       formatCode();
                       return true;
                     });
-                  }}theme="vs-dark"
-                  options={{
+                    
+                    // Alternative shortcut: F5 to refresh preview
+                    editor.addCommand(monaco.KeyCode.F5, () => {
+                      console.log('🎯 F5 pressed - refreshing preview');
+                      if (updateTimeoutRef.current) {
+                        clearTimeout(updateTimeoutRef.current);
+                      }
+                      generatePreview();
+                      setLastSaved(new Date());
+                      window.showToast?.('🔄 F5: Preview refreshed!', 'success');
+                      return true;
+                    });
+                    
+                    // Alternative shortcut: Ctrl+Enter to update preview
+                    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+                      console.log('🎯 Ctrl+Enter pressed - updating preview');
+                      if (updateTimeoutRef.current) {
+                        clearTimeout(updateTimeoutRef.current);
+                      }
+                      generatePreview();
+                      setLastSaved(new Date());
+                      window.showToast?.('⚡ Ctrl+Enter: Preview updated!', 'success');
+                      return true;
+                    });
+                  }}theme="vs-dark"                  options={{
                     fontSize: editorFontSize,
                     fontFamily: 'JetBrains Mono, Monaco, Consolas, monospace',
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
                     wordWrap: editorWordWrap,
-                    lineNumbers: editorLineNumbers,                    glyphMargin: false,
+                    lineNumbers: editorLineNumbers,
+                    glyphMargin: false,
                     folding: true,
                     lineDecorationsWidth: 0,
                     lineNumbersMinChars: 3,
-                    renderLineHighlight: 'line',                    automaticLayout: true,
-                    padding: { top: 20, bottom: 20 }
-                  }}                />
+                    renderLineHighlight: 'line',
+                    automaticLayout: true,
+                    padding: { top: 20, bottom: 20 },
+                    cursorBlinking: 'smooth',
+                    cursorSmoothCaretAnimation: 'on',
+                    cursorWidth: 2,
+                    // Fix cursor position issues
+                    mouseWheelZoom: false,
+                    fastScrollSensitivity: 5,
+                    renderWhitespace: 'none',
+                    roundedSelection: true
+                  }}/>
               </div>
             </div>
           </motion.div>
@@ -769,39 +948,43 @@ const UploadPage = () => {
                       <RefreshCw className="w-5 h-5 animate-spin" />
                       <span className="text-base font-semibold">Updating...</span>
                     </div>
-                  )}
-                  <button
+                  )}                  <button
                     onClick={handleManualSave}
                     disabled={isPreviewUpdating}
                     type="button"
-                    className={`transition-all duration-200 flex items-center space-x-3 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl ${
+                    className={`transition-all duration-200 flex items-center space-x-4 px-8 py-4 rounded-2xl font-black text-xl shadow-2xl hover:shadow-3xl transform hover:scale-110 border-4 ${
                       isPreviewUpdating
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-vault-accent hover:bg-green-600 text-white hover:transform hover:scale-105'
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
+                        : 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white border-green-400 ring-4 ring-green-400/30'
                     }`}
                   >
-                    <Play className="w-5 h-5" />
-                    <span>Update Now</span>
+                    <Play className="w-7 h-7" />
+                    <span>🚀 UPDATE NOW</span>
                   </button>
                 </div>
-              </div>
-                <div className="space-y-4 bg-slate-50 p-6 rounded-xl border border-gray-200">
+              </div>                <div className="space-y-4 bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-2xl border-2 border-blue-200 shadow-lg">
                 <div className="flex items-center space-x-3 text-green-700">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <p className="text-base font-semibold">
+                  <div className="w-4 h-4 bg-green-500 rounded-full shadow-md"></div>
+                  <p className="text-lg font-bold">
                     <strong>Auto-save:</strong> Preview updates automatically as you type (1 second delay)
                   </p>
                 </div>
                 <div className="flex items-center space-x-3 text-blue-700">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <p className="text-base font-semibold">
-                    <strong>Keyboard shortcuts:</strong> Press <kbd className="bg-white px-3 py-2 rounded-lg text-sm border border-gray-300 font-mono shadow-sm">Ctrl+S</kbd> to save immediately, <kbd className="bg-white px-3 py-2 rounded-lg text-sm border border-gray-300 font-mono shadow-sm">Ctrl+Shift+F</kbd> to format code
+                  <div className="w-4 h-4 bg-blue-500 rounded-full shadow-md"></div>
+                  <p className="text-lg font-bold">
+                    <strong>Multiple shortcuts:</strong> <kbd className="bg-white px-3 py-2 rounded-lg text-sm border-2 border-blue-300 font-mono shadow-sm font-bold">Ctrl+S</kbd>, <kbd className="bg-white px-3 py-2 rounded-lg text-sm border-2 border-green-300 font-mono shadow-sm font-bold">Ctrl+Enter</kbd>, or <kbd className="bg-white px-3 py-2 rounded-lg text-sm border-2 border-purple-300 font-mono shadow-sm font-bold">F5</kbd>
                   </p>
                 </div>
                 <div className="flex items-center space-x-3 text-purple-700">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                  <p className="text-base font-semibold">
-                    <strong>Manual update:</strong> Click "Update Now" button anytime
+                  <div className="w-4 h-4 bg-purple-500 rounded-full shadow-md"></div>
+                  <p className="text-lg font-bold">
+                    <strong>Manual update:</strong> Click any "Update" button or use the floating quick update button
+                  </p>
+                </div>
+                <div className="flex items-center space-x-3 text-orange-700">
+                  <div className="w-4 h-4 bg-orange-500 rounded-full shadow-md"></div>
+                  <p className="text-lg font-bold">
+                    <strong>Global shortcuts:</strong> Work anywhere on this page, even outside the editor
                   </p>
                 </div>
               </div>
