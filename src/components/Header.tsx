@@ -9,9 +9,9 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
   const handleSignInClick = () => {
     setIsAuthModalOpen(true);
+    setIsMenuOpen(false); // Close mobile menu when auth modal opens
   };
 
   // Close menu when clicking outside or pressing escape
@@ -131,26 +131,22 @@ const Header = () => {
                     >
                       <X className="w-5 h-5" />
                     </button>
-                  </div>
-
-                  {/* Search Bar */}
+                  </div>                  {/* Search Bar */}
                   <div className="p-6 border-b border-vault-light/20">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="text"
                         placeholder="Search snippets, tags, creators..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-vault-medium border border-vault-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-vault-accent focus:border-transparent text-white placeholder-gray-400"
+                        className="w-full px-4 py-3 bg-vault-medium border border-vault-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-vault-accent focus:border-transparent text-white placeholder-gray-400"
                       />
                     </div>
                   </div>
 
                   {/* Navigation Links */}
                   <div className="flex-1 overflow-y-auto">
-                    <div className="p-6 space-y-2">
-                      <Link
+                    <div className="p-6 space-y-2">                      <Link
                         to="/browse"
                         className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-vault-medium/50 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group"
                         onClick={() => setIsMenuOpen(false)}
@@ -172,9 +168,12 @@ const Header = () => {
                       <div className="pt-4 border-t border-vault-light/20 mt-4">
                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4">
                           Account
-                        </h3>
-                        <div className="px-4">
-                          <UserProfileDropdown onSignInClick={handleSignInClick} />
+                        </h3>                        <div className="px-4">
+                          <UserProfileDropdown 
+                            onSignInClick={handleSignInClick} 
+                            isMobile={true} 
+                            onMenuClick={() => setIsMenuOpen(false)}
+                          />
                         </div>
                       </div>
                     </div>

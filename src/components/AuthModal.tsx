@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Github } from 'lucide-react';
+import { X, Github } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.tsx';
 
 interface AuthModalProps {
@@ -71,10 +71,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
   const switchMode = (newMode: 'signin' | 'signup' | 'forgot') => {
     setMode(newMode);
     resetForm();
-  };
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
-      <div className="bg-vault-dark border border-vault-light/20 rounded-xl w-full max-w-md shadow-2xl">        {/* Header */}
+  };  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+      <div className="bg-vault-dark border border-vault-light/20 rounded-xl w-full max-w-md shadow-2xl">{/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-vault-light/20">
           <h2 className="text-xl font-semibold text-white">
             {mode === 'signin' && 'Sign In'}
@@ -101,51 +100,40 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Display Name
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-vault-medium border border-vault-light/30 rounded-lg focus:ring-2 focus:ring-vault-accent focus:border-vault-accent text-white placeholder-gray-500"
-                    placeholder="Your name"
-                    required
-                  />
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-vault-medium border border-vault-light/30 rounded-lg focus:ring-2 focus:ring-vault-accent focus:border-vault-accent text-white placeholder-gray-500"
-                  placeholder="your@email.com"
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="w-full px-4 py-3 bg-vault-medium border border-vault-light/30 rounded-lg focus:ring-2 focus:ring-vault-accent focus:border-vault-accent text-white placeholder-gray-500"
+                  placeholder="Your name"
                   required
                 />
               </div>
+            )}<div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-vault-medium border border-vault-light/30 rounded-lg focus:ring-2 focus:ring-vault-accent focus:border-vault-accent text-white placeholder-gray-500"
+                placeholder="your@email.com"
+                required
+              />
             </div>            {mode !== 'forgot' && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Password
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-vault-medium border border-vault-light/30 rounded-lg focus:ring-2 focus:ring-vault-accent focus:border-vault-accent text-white placeholder-gray-500"
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-vault-medium border border-vault-light/30 rounded-lg focus:ring-2 focus:ring-vault-accent focus:border-vault-accent text-white placeholder-gray-500"
+                  placeholder="••••••••"
+                  required
+                />
               </div>
             )}
 
