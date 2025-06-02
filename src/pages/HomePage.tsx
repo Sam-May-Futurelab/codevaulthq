@@ -6,9 +6,7 @@ import ThreeHero from '../components/ThreeHero.tsx';
 import SnippetCard from '../components/SnippetCard.tsx';
 import TagCloud from '../components/TagCloud.tsx';
 import { GSAPAnimations } from '../utils/GSAPAnimations';
-import { useFirebaseSnippets } from '../hooks/useFirebaseData';
-import { usePlatformStats } from '../hooks/useSnippetData';
-import { snippetsData } from '../data/snippets';
+import { useFirebaseSnippets, usePlatformStats } from '../hooks/useFirebaseData';
 import DataSeeder from '../services/DataSeeder';
 
 const HomePage = () => {
@@ -101,22 +99,12 @@ const HomePage = () => {
 
   const { stats: platformStats, loading: loadingStats, error: errorStats } = usePlatformStats();
   
-  // Combine Firebase snippets with mock data
+  // Use only Firebase snippets for display
   const [allSnippets, setAllSnippets] = useState<any[]>([]);
   
   useEffect(() => {
-    const mockSnippetsArray = Object.values(snippetsData);
-    const combinedSnippets = [
-      ...firebaseSnippets,
-      ...mockSnippetsArray
-    ];
-    
-    // Remove duplicates based on ID
-    const uniqueSnippets = combinedSnippets.filter((snippet, index, self) => 
-      index === self.findIndex(s => s.id === snippet.id)
-    );
-    
-    setAllSnippets(uniqueSnippets);
+    // Use only Firebase snippets, no mock data
+    setAllSnippets(firebaseSnippets);
   }, [firebaseSnippets]);
   
   // Get trending and top snippets from combined data
@@ -198,7 +186,7 @@ const HomePage = () => {
       const statElements = document.querySelectorAll('.stat-value');
       const values = [
         platformStats.totalSnippets,
-        platformStats.activeUsers,
+        platformStats.totalUsers,
         platformStats.totalDownloads,
         platformStats.totalLikes
       ];
@@ -236,7 +224,7 @@ const HomePage = () => {
     },    { 
       icon: Users, 
       label: 'Creators', 
-      value: loadingStats ? '3,892' : platformStats?.activeUsers.toLocaleString() || '3,892', 
+      value: loadingStats ? '3,892' : platformStats?.totalUsers.toLocaleString() || '3,892', 
       subtitle: 'Creative coders' 
     },
     { 
