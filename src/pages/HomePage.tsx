@@ -129,8 +129,7 @@ const HomePage = () => {
       })
       .slice(0, limit);
   };
-  
-  const getTopSnippets = (limit = 10) => {
+    const getTopSnippets = (limit = 10) => {
     return [...allSnippets]
       .sort((a, b) => {
         const aLikes = a.stats?.likes || a.metrics?.likes || a.analytics?.likes || 0;
@@ -139,8 +138,29 @@ const HomePage = () => {
       })
       .slice(0, limit);
   };
-  
-  const displayTrendingSnippets = getTrendingSnippets(6);
+
+  // Get best snippets from each category
+  const getBestSnippetsFromCategory = (categoryKey: string, limit = 4) => {
+    const category = categoryStructure[categoryKey as keyof typeof categoryStructure];
+    if (!category) return [];
+    
+    const subcategoryIds = category.subcategories.map(sub => sub.id);
+    
+    return [...allSnippets]
+      .filter(snippet => {
+        const snippetCategory = snippet.category?.id || snippet.language;
+        return subcategoryIds.includes(snippetCategory);
+      })
+      .sort((a, b) => {
+        const aScore = ((a.stats?.likes || a.metrics?.likes || a.analytics?.likes || 0) * 2) + 
+                      (a.stats?.views || a.metrics?.views || a.analytics?.views || 0);
+        const bScore = ((b.stats?.likes || b.metrics?.likes || b.analytics?.likes || 0) * 2) + 
+                      (b.stats?.views || b.metrics?.views || b.analytics?.views || 0);
+        return bScore - aScore;
+      })
+      .slice(0, limit);
+  };
+    const displayTrendingSnippets = getTrendingSnippets(10);
   const displayTopSnippets = getTopSnippets(10);
   
   // Debug Firebase connection
@@ -395,9 +415,95 @@ const HomePage = () => {
               >
                 View All Snippets
               </Link>
-            </motion.div>
+            </motion.div>          </div>
+        </section>        {/* Category Showcase Sections - Linear Layout */}
+        <section className="py-32 mt-24">
+          <div className="px-6 sm:px-8 lg:px-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-24"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 font-display">
+                Best in <span className="text-vault-accent">Each Category</span>
+              </h2>
+              <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-6">
+                Discover the top-rated snippets from each category of our collection
+              </p>
+              <p className="text-sm text-vault-accent font-code">
+                🏆 Handpicked gems from our creative community
+              </p>
+            </motion.div>            {/* Categories Linear Layout - Each category stacked vertically */}
+            <div className="space-y-20">
+              {Object.entries(categoryStructure).map(([categoryKey, category], categoryIndex) => {
+                const bestSnippets = getBestSnippetsFromCategory(categoryKey, 4);
+                
+                if (bestSnippets.length === 0) return null;
+                
+                const IconComponent = category.icon;
+                
+                return (
+                  <motion.div
+                    key={categoryKey}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: categoryIndex * 0.1 }}
+                    className="category-section-linear"
+                  >
+                    {/* Category Header */}
+                    <div className="text-center mb-12">
+                      <div className="flex items-center justify-center mb-4">
+                        <div className={`w-12 h-12 bg-gradient-to-br from-vault-purple/20 to-vault-accent/20 rounded-lg flex items-center justify-center mr-4`}>
+                          <IconComponent className={`w-6 h-6 ${category.color}`} />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white font-display">
+                          <span className={`${category.color}`}>{category.name}</span>
+                        </h3>
+                      </div>
+                      <p className="text-gray-400 text-sm">
+                        Top {bestSnippets.length} snippets from this category
+                      </p>
+                    </div>                    {/* Snippets Grid - Use same responsive grid as trending snippets */}
+                    <div className="snippet-grid mb-8">
+                      {bestSnippets.map((snippet: any, index: number) => (
+                        <motion.div
+                          key={snippet.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: index * 0.1 }}
+                          className="snippet-card"
+                        >
+                          <SnippetCard snippet={snippet} />
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* View Category Button - Smaller size */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ duration: 0.8, delay: 0.4 }}
+                      className="text-center"
+                    >
+                      <Link
+                        to={`/browse?category=${categoryKey}`}
+                        className="magnetic-button bg-gradient-to-r from-vault-accent/20 to-vault-purple/20 hover:from-vault-accent/30 hover:to-vault-purple/30 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:scale-105 border border-vault-accent/30 hover:border-vault-accent/50 inline-flex items-center space-x-2 text-sm"
+                      >
+                        <span>View {category.name}</span>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    </motion.div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
-        </section>        {/* Browse by Category Section */}
+        </section>
+
+        {/* Browse by Category Section */}
         <section className="category-section py-32 bg-gradient-to-r from-vault-purple/10 via-transparent to-vault-accent/10 my-24">
           <div className="px-6 sm:px-8 lg:px-10">
             <motion.div
