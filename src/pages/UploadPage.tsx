@@ -29,8 +29,9 @@ const UploadPage = () => {
     htmlCode: '<!-- Your HTML code here -->\n<!-- Examples: -->\n<!-- <div class="container"> -->\n<!-- <h1>Your Heading</h1> -->\n<!-- </div> -->\n',
     cssCode: '/* Your CSS code here */\n/* Examples: */\n/* body { */\n/*   background-color: #f5f5f5; */\n/*   font-family: Arial, sans-serif; */\n/* } */\n',
     jsCode: '// Your JavaScript code here\n// Examples:\n// document.addEventListener("DOMContentLoaded", function() {\n//   console.log("DOM loaded!");\n// });\n'
-  });const [activeTab, setActiveTab] = useState<'html' | 'css' | 'js'>('css');
-  const [tagInput, setTagInput] = useState('');
+  });  const [activeTab, setActiveTab] = useState<'html' | 'css' | 'js'>('css');
+  const [tagInput, setTagInput] = useState('');  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [isPreviewUpdating, setIsPreviewUpdating] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
@@ -96,13 +97,28 @@ const UploadPage = () => {
         setLastSaved(new Date());
         window.showToast?.('🔄 F5: Preview refreshed!', 'success');
       }
-    };
-
-    document.addEventListener('keydown', handleGlobalKeydown, true);
+    };    document.addEventListener('keydown', handleGlobalKeydown, true);
     return () => {
       document.removeEventListener('keydown', handleGlobalKeydown, true);
     };
-  }, []);  // Hierarchical category structure
+  }, []);
+  // Close category dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-category-dropdown]')) {
+        setShowCategoryDropdown(false);
+        setExpandedCategory(null); // Reset expanded state when closing
+      }
+    };
+
+    if (showCategoryDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showCategoryDropdown]);// Hierarchical category structure
   const categoryStructure = {
     essentials: {
       name: 'Essential Components',
@@ -535,82 +551,146 @@ const UploadPage = () => {
                   <label className="block text-xl font-bold text-gray-700 mb-4">
                     Category <span className="text-red-500">*</span>
                     <span className="block text-sm text-gray-500 font-normal mt-2">
-                      Select a main category first, then choose a specific subcategory (required)
+                      Choose from our organized categories (required)
                     </span>
-                  </label>
-                  
-                  {/* Main Categories */}
-                  <div className="space-y-6">
-                    {Object.entries(categoryStructure).map(([mainKey, mainCategory]) => (
-                      <div key={mainKey} className="space-y-3">
-                        <h4 className={`font-bold text-lg flex items-center ${mainCategory.color}`}>
-                          <mainCategory.icon className="w-5 h-5 mr-2" />
-                          {mainCategory.name}
-                        </h4>
-                        
-                        {/* Subcategories */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                          {mainCategory.subcategories.map((subcat) => {
-                            const isSelected = snippetData.category === subcat.id;
-                            return (
+                  </label>                  {/* Compact Category Dropdown */}
+                  <div className="relative" data-category-dropdown>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowCategoryDropdown(!showCategoryDropdown);
+                      }}
+                      className={`w-full bg-white border-2 rounded-xl px-6 py-4 text-left transition-all duration-200 flex items-center justify-between shadow-sm hover:shadow-md cursor-pointer ${
+                        snippetData.category
+                          ? 'border-vault-accent text-gray-800 bg-green-50'
+                          : 'border-gray-300 text-gray-500 hover:border-vault-accent hover:bg-blue-50'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        {snippetData.category ? (
+                          <>
+                            {(() => {
+                              // Find the selected category details
+                              for (const [mainKey, mainCategory] of Object.entries(categoryStructure)) {
+                                const subcat = mainCategory.subcategories.find(sub => sub.id === snippetData.category);
+                                if (subcat) {
+                                  return (
+                                    <>
+                                      <div 
+                                        className="w-4 h-4 rounded-full shadow-sm"
+                                        style={{
+                                          background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
+                                        }}
+                                      />
+                                      <span className="font-semibold text-gray-800">
+                                        {subcat.label}
+                                      </span>
+                                      <span className="text-sm text-gray-500">
+                                        in {mainCategory.name}
+                                      </span>
+                                    </>
+                                  );
+                                }
+                              }
+                              return null;
+                            })()}
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-4 h-4 rounded-full bg-gray-300"></div>
+                            <span className="font-medium">Click to select a category</span>
+                            <span className="text-sm text-gray-400">(required)</span>
+                          </>
+                        )}
+                      </div>
+                      <div className={`transform transition-transform duration-200 text-vault-accent font-bold ${showCategoryDropdown ? 'rotate-180' : ''}`}>
+                        ▼
+                      </div>
+                    </button>                    {/* Dropdown Menu - Accordion Style */}
+                    {showCategoryDropdown && (
+                      <div className="fixed inset-0 bg-black bg-opacity-50 z-[9998] flex items-center justify-center p-4"
+                           onClick={(e) => {
+                             if (e.target === e.currentTarget) {
+                               setShowCategoryDropdown(false);
+                               setExpandedCategory(null);
+                             }
+                           }}>
+                        <div className="bg-white border-2 border-gray-200 rounded-xl shadow-2xl max-h-96 overflow-y-auto w-full max-w-md"
+                             style={{ backgroundColor: '#ffffff' }}>
+                        {Object.entries(categoryStructure).map(([mainKey, mainCategory]) => {
+                          const isExpanded = expandedCategory === mainKey;
+                          
+                          return (
+                            <div key={mainKey} className="border-b border-gray-100 last:border-b-0">                              {/* Collapsible Main Category Header */}
                               <button
-                                key={subcat.id}
+                                type="button"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  setSnippetData(prev => ({ ...prev, category: subcat.id }));
-                                  window.showToast?.(`Category selected: ${subcat.label}`, 'success');
+                                  setExpandedCategory(isExpanded ? null : mainKey);
                                 }}
-                                type="button"
-                                className={`p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer min-h-[70px] flex flex-col items-center justify-center relative overflow-hidden group ${
-                                  isSelected
-                                    ? 'border-transparent shadow-xl transform scale-105 text-white'
-                                    : 'border-gray-300 bg-white hover:border-gray-400 text-gray-700 hover:shadow-lg hover:transform hover:scale-102'
-                                }`}
-                                style={{
-                                  background: isSelected 
-                                    ? `linear-gradient(135deg, ${getGradientColors(mainKey)})`
-                                    : undefined
-                                }}
-                              >
-                                {/* Beautiful gradient overlay for selected state */}
-                                {isSelected && (
-                                  <div 
-                                    className="absolute inset-0 opacity-90"
-                                    style={{
-                                      background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
-                                    }}
-                                  />
-                                )}
-                                
-                                {/* Hover gradient effect */}
-                                {!isSelected && (
-                                  <div 
-                                    className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                                    style={{
-                                      background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
-                                    }}
-                                  />
-                                )}
-                                
-                                <div className="relative z-10 text-center">
-                                  <div className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-gray-700'}`}>
-                                    {subcat.label}
-                                  </div>
-                                  
-                                  {/* Selected indicator */}
-                                  {isSelected && (
-                                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
-                                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    </div>
-                                  )}
+                                className={`w-full px-4 py-3 font-bold flex items-center justify-between hover:bg-gray-100 transition-colors duration-200`}
+                                style={{ backgroundColor: '#f9fafb', color: '#374151' }}
+                              >                                <div className="flex items-center">
+                                  <mainCategory.icon className="w-5 h-5 mr-3" style={{ color: '#374151' }} />
+                                  <span style={{ color: '#374151' }}>{mainCategory.name}</span>
+                                  <span className="ml-2 text-xs bg-white/50 px-2 py-1 rounded-full" style={{ color: '#6b7280' }}>
+                                    {mainCategory.subcategories.length}
+                                  </span>
+                                </div>
+                                <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} style={{ color: '#374151' }}>
+                                  ▼
                                 </div>
                               </button>
-                            );
-                          })}
+                                {/* Collapsible Subcategories */}
+                              {isExpanded && (
+                                <div className="bg-white" style={{ backgroundColor: '#ffffff' }}>
+                                  {mainCategory.subcategories.map((subcat) => {
+                                    const isSelected = snippetData.category === subcat.id;
+                                    return (
+                                      <button
+                                        key={subcat.id}
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          setSnippetData(prev => ({ ...prev, category: subcat.id }));
+                                          setShowCategoryDropdown(false);
+                                          setExpandedCategory(null);
+                                          window.showToast?.(`Category selected: ${subcat.label}`, 'success');
+                                        }}                                        className={`w-full px-8 py-3 text-left hover:bg-blue-50 transition-all duration-200 flex items-center justify-between group ${
+                                          isSelected ? 'bg-green-50 border-l-4 border-green-500 font-semibold' : 'hover:pl-10'
+                                        }`}
+                                        style={{ color: isSelected ? '#065f46' : '#374151' }}
+                                      >
+                                        <div className="flex items-center space-x-3">
+                                          <div 
+                                            className="w-3 h-3 rounded-full opacity-60 group-hover:opacity-100 shadow-sm"
+                                            style={{
+                                              background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
+                                            }}
+                                          />                                          <span className={`${isSelected ? 'text-green-700' : 'text-gray-700'}`} style={{ color: isSelected ? '#065f46' : '#374151' }}>
+                                            {subcat.label}
+                                          </span>
+                                        </div>
+                                        
+                                        {isSelected && (
+                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
+                                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                                          </div>
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );                        })}
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div><div>                  <label className="block text-xl font-bold text-gray-700 mb-8">
                     Tags
