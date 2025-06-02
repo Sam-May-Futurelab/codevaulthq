@@ -91,3 +91,28 @@ main {
     padding: 1rem 0;
   }
 }
+
+/* Force dropdown option styling to be visible */
+select option {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+}
+
+/* Additional select styling for better visibility */
+select {
+  color-scheme: dark;
+}
+
+/* Webkit-specific select option styling */
+select::-webkit-option {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+}
+
+/* Firefox-specific select option styling */
+@-moz-document url-prefix() {
+  select option {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+  }
+}

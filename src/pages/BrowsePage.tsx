@@ -184,6 +184,25 @@ const BrowsePage = () => {
     
     return false;
   };
+  // Helper function to generate results text
+  const getResultsText = () => {
+    const count = sortedSnippets.length;
+    
+    if (selectedCategory !== 'all' && selectedTag !== 'all') {
+      const categoryName = categories.find(cat => cat.id === selectedCategory)?.label || selectedCategory;
+      return `Showing ${count} snippet${count !== 1 ? 's' : ''} for ${categoryName} category with #${selectedTag} tag`;
+    } else if (selectedCategory !== 'all') {
+      const categoryName = categories.find(cat => cat.id === selectedCategory)?.label || selectedCategory;
+      return `Showing ${count} snippet${count !== 1 ? 's' : ''} for ${categoryName} category`;
+    } else if (selectedTag !== 'all') {
+      return `Showing ${count} snippet${count !== 1 ? 's' : ''} with #${selectedTag} tag`;
+    } else if (searchQuery) {
+      return `Showing ${count} search result${count !== 1 ? 's' : ''} for "${searchQuery}"`;
+    } else {
+      return `Showing ${count} of ${allSnippets.length} snippet${count !== 1 ? 's' : ''}`;
+    }
+  };
+  
   // Filter snippets based on search and filters
   const filteredSnippets = allSnippets.filter(snippet => {
     const matchesSearch = snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -229,11 +248,10 @@ const BrowsePage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">
+        >          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Browse <span className="text-vault-accent">Snippets</span>
           </h1>
-          <p className="text-xl text-gray-400">
+          <p className="text-lg text-gray-400">
             Discover amazing code from our community
           </p>
         </motion.div>
@@ -257,46 +275,49 @@ const BrowsePage = () => {
 
           {/* Filters Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">            {/* Category Filter */}            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1.5">Category</label>
-              <select
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">Category</label>              <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
-              >
-                {categories.map((category) => (
+                style={{ 
+                  colorScheme: 'dark',
+                  backgroundColor: '#0a0a0a',
+                  color: '#ffffff'
+                }}
+              >                {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.label}
                   </option>
                 ))}
               </select>
-            </div>            {/* Tag Filter */}            <div>
+            </div>{/* Tag Filter */}            <div>
               <label className="block text-xs font-medium text-gray-300 mb-1.5">Tag</label>
               <select
                 value={selectedTag}
                 onChange={(e) => setSelectedTag(e.target.value)}
-                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
+                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent [&>option]:bg-vault-dark [&>option]:text-white"
               >
-                <option value="all">All Tags</option>
+                <option value="all" className="bg-vault-dark text-white">All Tags</option>
                 {popularTags.map((tag) => (
-                  <option key={tag} value={tag}>
+                  <option key={tag} value={tag} className="bg-vault-dark text-white">
                     #{tag}
                   </option>
                 ))}
               </select>
-            </div>            {/* Sort */}            <div>
+            </div>{/* Sort */}            <div>
               <label className="block text-xs font-medium text-gray-300 mb-1.5">Sort by</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
+                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent [&>option]:bg-vault-dark [&>option]:text-white"
               >
                 {sortOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
+                  <option key={option.id} value={option.id} className="bg-vault-dark text-white">
                     {option.label}
                   </option>
                 ))}
               </select>
-            </div>            {/* View Mode */}            <div>
+            </div>{/* View Mode */}            <div>
               <label className="block text-xs font-medium text-gray-300 mb-1.5">View</label>
               <div className="flex space-x-1">
                 <button
@@ -322,8 +343,8 @@ const BrowsePage = () => {
               </div>
             </div>
           </div>          {/* Results count */}
-          <div className="text-gray-400 text-xs mt-2">
-            Showing {sortedSnippets.length} of {allSnippets.length} snippets
+          <div className="text-gray-400 text-sm mt-3 mb-6">
+            {getResultsText()}
           </div>
         </motion.div>        {/* Results */}
         <motion.div
