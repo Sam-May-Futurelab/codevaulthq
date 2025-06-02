@@ -19,18 +19,19 @@ export const useFirebaseSnippets = (options?: {
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
-    let timeoutId: NodeJS.Timeout | undefined;
-
-    const fetchSnippets = async () => {
+    let timeoutId: NodeJS.Timeout | undefined;    const fetchSnippets = async () => {
       try {
         setLoading(true);
         setError(null);
-
+        
+        console.log('useFirebaseSnippets: Starting fetch with options:', options);
+        
         if (options?.realtime) {
           // Set a timeout to prevent indefinite loading
           timeoutId = setTimeout(() => {
+            console.log('Firebase connection timeout - falling back to empty results');
             setLoading(false);
-          }, 5000); // 5 second timeout
+          }, 10000); // 10 second timeout
 
           // Real-time subscription
           unsubscribe = FirebaseDbService.subscribeToSnippets(
@@ -40,6 +41,8 @@ export const useFirebaseSnippets = (options?: {
                 clearTimeout(timeoutId);
                 timeoutId = undefined;
               }
+              
+              console.log('Firebase real-time update received', { count: updatedSnippets.length });
               
               const convertedSnippets = updatedSnippets
                 .filter(snippet => snippet.id) // Filter out snippets without ID

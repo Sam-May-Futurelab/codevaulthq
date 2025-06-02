@@ -780,7 +780,7 @@ a[href*="/snippet/"]:hover {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
-  justify-items: stretch;
+  justify-content: center;
 }
 
 /* FORCE consistent card dimensions */
@@ -788,6 +788,8 @@ a[href*="/snippet/"]:hover {
   height: 480px; /* Fixed total card height - increased from 420px */
   min-height: 480px;
   max-height: 480px;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 /* Mobile responsive card sizing */

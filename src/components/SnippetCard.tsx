@@ -192,13 +192,12 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
     vue: '💚',
     animation: '✨'
   };
-
   return (
     <motion.div
-      className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-none flex flex-col"
+      className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 w-full h-full max-w-[400px] flex flex-col"
       style={{ 
         height: '480px', 
-        minHeight: '480px', 
+        minHeight: '480px',
         maxHeight: '480px' 
       }}
     >
