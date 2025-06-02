@@ -228,7 +228,7 @@ const BrowsePage = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">
             Browse <span className="text-vault-accent">Snippets</span>
@@ -243,27 +243,25 @@ const BrowsePage = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6 mb-8"
-        >          {/* Search Bar */}
-          <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-4 mb-6"
+        >          {/* Search Bar */}          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search snippets, tags, creators..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-vault-dark border border-vault-light/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-vault-accent focus:border-transparent text-white placeholder-gray-400 text-lg"
+              className="w-full pl-10 pr-4 py-2.5 bg-vault-dark border border-vault-light/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-vault-accent focus:border-transparent text-white placeholder-gray-400"
             />
           </div>
 
           {/* Filters Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">            {/* Category Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-4">Category</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">            {/* Category Filter */}            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">Category</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
+                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
               >
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -271,13 +269,12 @@ const BrowsePage = () => {
                   </option>
                 ))}
               </select>
-            </div>            {/* Tag Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">Tag</label>
+            </div>            {/* Tag Filter */}            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">Tag</label>
               <select
                 value={selectedTag}
                 onChange={(e) => setSelectedTag(e.target.value)}
-                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
+                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
               >
                 <option value="all">All Tags</option>
                 {popularTags.map((tag) => (
@@ -286,13 +283,12 @@ const BrowsePage = () => {
                   </option>
                 ))}
               </select>
-            </div>            {/* Sort */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">Sort by</label>
+            </div>            {/* Sort */}            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">Sort by</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
+                className="w-full bg-vault-dark border border-vault-light/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-vault-accent"
               >
                 {sortOptions.map((option) => (
                   <option key={option.id} value={option.id}>
@@ -300,13 +296,12 @@ const BrowsePage = () => {
                   </option>
                 ))}
               </select>
-            </div>            {/* View Mode */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">View</label>
-              <div className="flex space-x-2">
+            </div>            {/* View Mode */}            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">View</label>
+              <div className="flex space-x-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`flex-1 flex items-center justify-center py-3 px-4 rounded-lg transition-colors ${
+                  className={`flex-1 flex items-center justify-center py-2 px-3 rounded-lg transition-colors ${
                     viewMode === 'grid'
                       ? 'bg-vault-accent text-black'
                       : 'bg-vault-dark text-gray-300 hover:text-white'
@@ -316,7 +311,7 @@ const BrowsePage = () => {
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`flex-1 flex items-center justify-center py-3 px-4 rounded-lg transition-colors ${
+                  className={`flex-1 flex items-center justify-center py-2 px-3 rounded-lg transition-colors ${
                     viewMode === 'list'
                       ? 'bg-vault-accent text-black'
                       : 'bg-vault-dark text-gray-300 hover:text-white'
@@ -326,10 +321,8 @@ const BrowsePage = () => {
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Results count */}
-          <div className="text-gray-400 text-sm mt-4">
+          </div>          {/* Results count */}
+          <div className="text-gray-400 text-xs mt-2">
             Showing {sortedSnippets.length} of {allSnippets.length} snippets
           </div>
         </motion.div>        {/* Results */}
