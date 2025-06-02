@@ -1,16 +1,35 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Grid, List } from 'lucide-react';
 import SnippetCard from '../components/SnippetCard.tsx';
 import { snippetsData } from '../data/snippets';
 import { useFirebaseSnippets } from '../hooks/useFirebaseData';
 
 const BrowsePage = () => {
+  const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Read URL parameters on mount
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    const tagParam = searchParams.get('tag');
+    const queryParam = searchParams.get('q');
+    
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+    if (tagParam) {
+      setSelectedTag(tagParam);
+    }
+    if (queryParam) {
+      setSearchQuery(queryParam);
+    }
+  }, [searchParams]);
     // Get Firebase snippets (user uploaded)
   const { snippets: firebaseSnippets } = useFirebaseSnippets({
     orderByField: 'createdAt',
@@ -34,10 +53,87 @@ const BrowsePage = () => {
       index === self.findIndex(s => s.id === snippet.id)
     );
     
-    setAllSnippets(uniqueSnippets);
-  }, [firebaseSnippets]);
+    setAllSnippets(uniqueSnippets);  }, [firebaseSnippets]);
+
+  // Hierarchical category structure (same as HomePage)
+  const categoryStructure = {
+    essentials: {
+      name: 'Essential Components',
+      subcategories: [
+        { id: 'ui-components', label: 'UI Components' },
+        { id: 'forms', label: 'Forms & Inputs' },
+        { id: 'navigation', label: 'Navigation' },
+        { id: 'buttons', label: 'Buttons & CTAs' },
+        { id: 'modals', label: 'Modals & Dialogs' }
+      ]
+    },
+    visual: {
+      name: 'Visual & Animation',
+      subcategories: [
+        { id: 'animations', label: 'Animations' },
+        { id: 'transitions', label: 'Transitions' },
+        { id: 'backgrounds', label: 'Background Effects' },
+        { id: 'text-effects', label: 'Text Effects' },
+        { id: 'loaders', label: 'Loading Indicators' }
+      ]
+    },
+    layout: {
+      name: 'Layout & Structure',
+      subcategories: [
+        { id: 'grid-systems', label: 'Grid & Flexbox' },
+        { id: 'responsive', label: 'Responsive Design' },
+        { id: 'cards', label: 'Cards & Containers' },
+        { id: 'heroes', label: 'Hero Sections' },
+        { id: 'page-sections', label: 'Page Sections' }
+      ]
+    },
+    interactive: {
+      name: 'Interactive & Dynamic',
+      subcategories: [
+        { id: 'data-display', label: 'Data Visualization' },
+        { id: 'interactive', label: 'Interactive Demos' },
+        { id: 'games', label: 'Games & Playful' },
+        { id: 'api', label: 'API Integration' },
+        { id: 'auth', label: 'Authentication' }
+      ]
+    },    advanced: {
+      name: 'Advanced & Experimental',
+      subcategories: [
+        { id: 'canvas', label: 'Canvas & Graphics' },
+        { id: 'webgl', label: 'WebGL & 3D' },
+        { id: 'svg', label: 'SVG Animations' },
+        { id: 'performance', label: 'Performance' },
+        { id: 'accessibility', label: 'Accessibility' }
+      ]
+    },
+    utilities: {
+      name: 'Tools & Utilities',
+      subcategories: [
+        { id: 'utilities', label: 'Developer Tools' },
+        { id: 'plugins', label: 'Plugins & Add-ons' },
+        { id: 'extensions', label: 'Browser Extensions' },
+        { id: 'snippets', label: 'Code Snippets' },
+        { id: 'generators', label: 'Generators' }
+      ]
+    }
+  };
+
+  // Build comprehensive category list for dropdown
   const categories = [
     { id: 'all', label: 'All Categories' },
+    // Main categories
+    ...Object.entries(categoryStructure).map(([key, category]) => ({
+      id: key,
+      label: category.name
+    })),
+    // Subcategories
+    ...Object.values(categoryStructure).flatMap(category =>
+      category.subcategories.map(sub => ({
+        id: sub.id,
+        label: sub.label
+      }))
+    ),
+    // Legacy categories for backward compatibility
     { id: 'css', label: 'CSS' },
     { id: 'javascript', label: 'JavaScript' },
     { id: 'html', label: 'HTML' },
@@ -54,8 +150,7 @@ const BrowsePage = () => {
     { id: 'popular', label: 'Most Popular' },
     { id: 'views', label: 'Most Viewed' },
     { id: 'likes', label: 'Most Liked' }
-  ];
-  // Helper function to get category from snippet
+  ];  // Helper function to get category from snippet (improved)
   const getSnippetCategory = (snippet: any) => {
     // Handle new hierarchical category structure
     if (snippet.category && typeof snippet.category === 'object' && snippet.category.id) {
@@ -64,17 +159,41 @@ const BrowsePage = () => {
     // Fallback to old format or language field
     return snippet.category || snippet.language || 'javascript';
   };
+
+  // Helper function to check if snippet matches category filter
+  const matchesCategory = (snippet: any, categoryFilter: string) => {
+    if (categoryFilter === 'all') return true;
+    
+    const snippetCategory = getSnippetCategory(snippet);
+    
+    // Direct match
+    if (snippetCategory === categoryFilter) return true;
+    
+    // Check if it's a main category match
+    if (snippet.category && typeof snippet.category === 'object' && snippet.category.mainCategory) {
+      if (snippet.category.mainCategory.id === categoryFilter) return true;
+    }
+    
+    // Check if the filter is a main category and snippet belongs to its subcategories
+    for (const [mainCatKey, mainCat] of Object.entries(categoryStructure)) {
+      if (mainCatKey === categoryFilter) {
+        // Check if snippet's category is one of this main category's subcategories
+        return mainCat.subcategories.some(sub => sub.id === snippetCategory);
+      }
+    }
+    
+    return false;
+  };
   // Filter snippets based on search and filters
   const filteredSnippets = allSnippets.filter(snippet => {
     const matchesSearch = snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          snippet.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          snippet.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    const snippetCategory = getSnippetCategory(snippet);
-    const matchesCategory = selectedCategory === 'all' || snippetCategory === selectedCategory;
+    const categoryMatch = matchesCategory(snippet, selectedCategory);
     const matchesTag = selectedTag === 'all' || snippet.tags.includes(selectedTag);
     
-    return matchesSearch && matchesCategory && matchesTag;
+    return matchesSearch && categoryMatch && matchesTag;
   });
 
   // Sort snippets

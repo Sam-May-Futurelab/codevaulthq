@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Code, Users, Download, Star, Code2, Palette, Layout, Settings, Sparkles } from 'lucide-react';
+import { Code, Users, Download, Star, Code2, Palette, Layout, Settings, Sparkles, Wrench } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import ThreeHero from '../components/ThreeHero.tsx';
@@ -66,8 +66,7 @@ const HomePage = () => {
         { id: 'api', label: 'API Integration' },
         { id: 'auth', label: 'Authentication' }
       ]
-    },
-    advanced: {
+    },    advanced: {
       name: 'Advanced & Experimental',
       icon: Sparkles,
       color: 'text-purple-500',
@@ -77,6 +76,17 @@ const HomePage = () => {
         { id: 'svg', label: 'SVG Animations' },
         { id: 'performance', label: 'Performance' },
         { id: 'accessibility', label: 'Accessibility' }
+      ]
+    },    utilities: {
+      name: 'Tools & Utilities',
+      icon: Wrench,
+      color: 'text-gray-500',
+      subcategories: [
+        { id: 'utilities', label: 'Developer Tools' },
+        { id: 'plugins', label: 'Plugins & Add-ons' },
+        { id: 'extensions', label: 'Browser Extensions' },
+        { id: 'snippets', label: 'Code Snippets' },
+        { id: 'generators', label: 'Generators' }
       ]
     }
   };
