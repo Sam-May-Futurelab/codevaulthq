@@ -796,6 +796,30 @@ a[href*="/snippet/"]:hover {
   flex-grow: 0 !important;
 }
 
+/* Force proper inner content padding - VERY SPECIFIC */
+.snippet-grid .bg-vault-medium > div:last-child {
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure content areas have proper spacing */
+.snippet-grid .bg-vault-medium .flex.flex-col.justify-between {
+  padding: 20px !important;
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+}
+
+/* Additional specific targeting for content elements */
+.snippet-grid .bg-vault-medium/50 > div:last-child {
+  padding: 20px !important;
+}
+
+/* Force all snippet card content to have padding */
+.snippet-card-content {
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
 /* Mobile: Keep it simple and consistent */
 @media (max-width: 768px) {
   .snippet-grid {

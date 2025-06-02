@@ -202,14 +202,14 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
         maxHeight: '480px',
         margin: '0 auto'
       }}
-    >
-      <motion.div
+    >      <motion.div
         className="bg-vault-medium/50 backdrop-blur-sm border border-vault-light/20 rounded-xl overflow-hidden hover:border-vault-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-vault-accent/10 flex flex-col"
         style={{ 
           width: '100%',
           height: '100%',
           minHeight: '100%',
-          maxHeight: '100%'
+          maxHeight: '100%',
+          boxSizing: 'border-box'
         }}
       >
       {/* DEDICATED LIVE PREVIEW SECTION - Exactly 260px height */}
@@ -285,15 +285,17 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
             <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
           </button>
         </div>
-      </div>
-
-      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}
+      </div>      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}
       <div 
-        className="p-4 flex flex-col justify-between flex-shrink-0"
+        className="snippet-card-content flex flex-col justify-between flex-shrink-0"
         style={{ 
           height: '220px', 
           minHeight: '220px', 
-          maxHeight: '220px' 
+          maxHeight: '220px',
+          padding: '20px !important',
+          paddingTop: '16px !important',
+          paddingBottom: '16px !important',
+          boxSizing: 'border-box'
         }}
       >
         {/* Title and Description - Top section */}
