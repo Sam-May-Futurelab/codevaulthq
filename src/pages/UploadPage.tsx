@@ -657,15 +657,16 @@ const UploadPage = () => {
                     Press <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border border-gray-300 shadow-sm">Ctrl+S</kbd> to save
                   </div>
                 </div>
+              </div>              {/* Currently Editing Indicator */}
+              <div className="bg-slate-100 px-6 py-4 border-b border-gray-200">
+                <span className="bg-vault-accent text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md inline-block">
+                  Currently editing: {activeTab.toUpperCase()}
+                </span>
               </div>
 
               {/* Monaco Editor Container */}
-              <div className="h-[600px] relative bg-[#1e1e1e]">
-                <div className="absolute top-6 left-6 z-10">
-                  <span className="bg-vault-accent text-white px-6 py-3 rounded-xl text-base font-bold shadow-lg">
-                    Currently editing: {activeTab.toUpperCase()}
-                  </span>
-                </div><Editor
+              <div className="h-[600px] bg-[#1e1e1e]">
+                <Editor
                   height="100%"
                   language={editorTabs.find(tab => tab.id === activeTab)?.language}
                   value={
