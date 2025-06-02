@@ -261,11 +261,30 @@ const UploadPage = () => {
         window.showToast?.('Please enter a description for your snippet', 'error');
         return;
       }      // Prepare snippet data for Firebase
+      // Find the complete category information
+      let categoryInfo = { id: snippetData.category, label: snippetData.category, mainCategory: { id: '', name: '', color: '' } };
+      for (const [mainCategoryKey, mainCategory] of Object.entries(categoryStructure)) {
+        const subcat = mainCategory.subcategories.find(sub => sub.id === snippetData.category);
+        if (subcat) {
+          categoryInfo = {
+            id: subcat.id,
+            label: subcat.label,
+            mainCategory: {
+              id: mainCategoryKey,
+              name: mainCategory.name,
+              color: mainCategory.color
+            }
+          };
+          break;
+        }
+      }
+
       const firebaseSnippetData = {
         title: snippetData.title.trim(),
         description: snippetData.description.trim(),
         code: `${snippetData.htmlCode}\n\n/* CSS */\n${snippetData.cssCode}\n\n/* JavaScript */\n${snippetData.jsCode}`,
-        language: snippetData.category,
+        language: snippetData.category, // Keep for backward compatibility
+        category: categoryInfo,
         tags: snippetData.tags.filter(tag => tag.trim().length > 0),
         isPublic: true,
         authorId: currentUser.uid,

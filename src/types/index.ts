@@ -155,3 +155,30 @@ export const convertFirebaseSnippet = (firebaseSnippet: FirebaseSnippet): Snippe
     trendingScore: firebaseSnippet.analytics.engagementRate,
   };
 };
+
+// Enhanced Category Structures
+export interface CategoryInfo {
+  id: string;
+  label: string;
+  mainCategory: {
+    id: string;
+    name: string;
+    color: string;
+  };
+}
+
+export interface MainCategory {
+  name: string;
+  icon: any; // Lucide React component
+  color: string;
+  subcategories: SubCategory[];
+}
+
+export interface SubCategory {
+  id: string;
+  label: string;
+}
+
+export interface CategoryStructure {
+  [key: string]: MainCategory;
+}

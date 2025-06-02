@@ -68,7 +68,16 @@ export interface FirestoreSnippet {
   title: string;
   description: string;
   code: string;
-  language: string;
+  language: string; // Keep for backward compatibility
+  category: {
+    id: string;
+    label: string;
+    mainCategory: {
+      id: string;
+      name: string;
+      color: string;
+    };
+  };
   tags: string[];
   authorId: string;
   authorName: string;
@@ -122,10 +131,9 @@ export class FirebaseDbService {
   static async getSnippet(id: string): Promise<FirestoreSnippet | null> {
     try {
       const docRef = doc(db, COLLECTIONS.SNIPPETS, id);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() } as FirestoreSnippet;
+      const docSnap = await getDoc(docRef);      if (docSnap.exists()) {
+        const rawData = { id: docSnap.id, ...docSnap.data() };
+        return this.normalizeCategoryData(rawData);
       }
       return null;
     } catch (error) {
@@ -170,15 +178,13 @@ export class FirebaseDbService {
 
       if (queryOptions?.startAfterDoc) {
         constraints.push(startAfter(queryOptions.startAfterDoc));
-      }
-
-      const q = query(collection(db, COLLECTIONS.SNIPPETS), ...constraints);
+      }      const q = query(collection(db, COLLECTIONS.SNIPPETS), ...constraints);
       const querySnapshot = await getDocs(q);
 
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as FirestoreSnippet));
+      return querySnapshot.docs.map(doc => {
+        const rawData = { id: doc.id, ...doc.data() };
+        return this.normalizeCategoryData(rawData);
+      });
     } catch (error) {
       console.error('Error fetching snippets:', error);
       return [];
@@ -419,6 +425,39 @@ export class FirebaseDbService {
       console.error('Error searching snippets:', error);
       return [];
     }
+  }
+
+  // Helper function to ensure category compatibility
+  static normalizeCategoryData(snippet: any): FirestoreSnippet {
+    // If the snippet has the old format (only language field), convert it
+    if (snippet.language && !snippet.category) {
+      // Try to find the category from our current structure
+      // This is a fallback for old data
+      snippet.category = {
+        id: snippet.language,
+        label: snippet.language,
+        mainCategory: {
+          id: 'visual', // Default to visual category
+          name: 'Visual & Animation',
+          color: 'text-pink-500'
+        }
+      };
+    }
+    
+    // Ensure all required fields exist
+    if (!snippet.category) {
+      snippet.category = {
+        id: snippet.language || 'animations',
+        label: snippet.language || 'Animations',
+        mainCategory: {
+          id: 'visual',
+          name: 'Visual & Animation', 
+          color: 'text-pink-500'
+        }
+      };
+    }
+    
+    return snippet as FirestoreSnippet;
   }
 
   // Utility methods
