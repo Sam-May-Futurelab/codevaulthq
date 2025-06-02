@@ -163,7 +163,18 @@ const UploadPage = () => {
         { id: 'performance', label: 'Performance' },
         { id: 'accessibility', label: 'Accessibility' }
       ]
-    }
+    }  };
+
+  // Helper function to get gradient colors for each category
+  const getGradientColors = (categoryKey: string): string => {
+    const gradients = {
+      essentials: '#3B82F6, #1E40AF', // Blue gradient
+      visual: '#EC4899, #BE185D', // Pink gradient  
+      layout: '#10B981, #047857', // Green gradient
+      interactive: '#F97316, #EA580C', // Orange gradient
+      advanced: '#8B5CF6, #7C3AED' // Purple gradient
+    };
+    return gradients[categoryKey as keyof typeof gradients] || '#6B7280, #4B5563';
   };
 
   // Legacy categories for backward compatibility
@@ -524,31 +535,81 @@ const UploadPage = () => {
                   <label className="block text-xl font-bold text-gray-700 mb-4">
                     Category <span className="text-red-500">*</span>
                     <span className="block text-sm text-gray-500 font-normal mt-2">
-                      Select a category that best matches your code snippet (required)
+                      Select a main category first, then choose a specific subcategory (required)
                     </span>
                   </label>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {categories.map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setSnippetData(prev => ({ ...prev, category: category.id }));
-                          window.showToast?.(`Category selected: ${category.label}`, 'info');
-                        }}
-                        type="button"
-                        className={`p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer min-h-[60px] flex flex-col items-center justify-center ${
-                          snippetData.category === category.id
-                            ? 'border-vault-accent bg-vault-accent/15 text-vault-accent shadow-lg transform scale-105'
-                            : 'border-gray-300 bg-white hover:border-vault-accent/60 text-gray-700 hover:shadow-md hover:transform hover:scale-102 hover:bg-gray-50'
-                        }`}
-                      >
-                        <category.icon className={`w-5 h-5 mb-1 ${
-                          snippetData.category === category.id ? 'text-vault-accent' : 'text-gray-600'
-                        }`} />
-                        <div className="text-sm font-semibold">{category.label}</div>
-                      </button>
+                  
+                  {/* Main Categories */}
+                  <div className="space-y-6">
+                    {Object.entries(categoryStructure).map(([mainKey, mainCategory]) => (
+                      <div key={mainKey} className="space-y-3">
+                        <h4 className={`font-bold text-lg flex items-center ${mainCategory.color}`}>
+                          <mainCategory.icon className="w-5 h-5 mr-2" />
+                          {mainCategory.name}
+                        </h4>
+                        
+                        {/* Subcategories */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {mainCategory.subcategories.map((subcat) => {
+                            const isSelected = snippetData.category === subcat.id;
+                            return (
+                              <button
+                                key={subcat.id}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setSnippetData(prev => ({ ...prev, category: subcat.id }));
+                                  window.showToast?.(`Category selected: ${subcat.label}`, 'success');
+                                }}
+                                type="button"
+                                className={`p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer min-h-[70px] flex flex-col items-center justify-center relative overflow-hidden group ${
+                                  isSelected
+                                    ? 'border-transparent shadow-xl transform scale-105 text-white'
+                                    : 'border-gray-300 bg-white hover:border-gray-400 text-gray-700 hover:shadow-lg hover:transform hover:scale-102'
+                                }`}
+                                style={{
+                                  background: isSelected 
+                                    ? `linear-gradient(135deg, ${getGradientColors(mainKey)})`
+                                    : undefined
+                                }}
+                              >
+                                {/* Beautiful gradient overlay for selected state */}
+                                {isSelected && (
+                                  <div 
+                                    className="absolute inset-0 opacity-90"
+                                    style={{
+                                      background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
+                                    }}
+                                  />
+                                )}
+                                
+                                {/* Hover gradient effect */}
+                                {!isSelected && (
+                                  <div 
+                                    className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+                                    style={{
+                                      background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
+                                    }}
+                                  />
+                                )}
+                                
+                                <div className="relative z-10 text-center">
+                                  <div className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-gray-700'}`}>
+                                    {subcat.label}
+                                  </div>
+                                  
+                                  {/* Selected indicator */}
+                                  {isSelected && (
+                                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
+                                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div><div>                  <label className="block text-xl font-bold text-gray-700 mb-8">
@@ -628,213 +689,106 @@ const UploadPage = () => {
             </div>
 
             {/* Code Editor */}
-            <div className="bg-white/95 border border-gray-200 rounded-2xl overflow-hidden shadow-xl">
-              {/* Editor Header */}
-              <div className="bg-gradient-to-r from-slate-50 to-slate-100 px-12 py-16 border-b border-gray-200">
-                <div className="mb-12">
-                  <h3 className="text-4xl font-bold text-gray-800 flex items-center mb-8">
-                    <Code2 className="w-10 h-10 mr-6 text-vault-accent" />
+            <div className="bg-white/95 border border-gray-200 rounded-2xl overflow-hidden shadow-xl">              {/* Compact Editor Header */}
+              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                    <Code2 className="w-5 h-5 mr-2 text-vault-accent" />
                     Code Editor
                   </h3>
-                  <p className="text-gray-600 text-xl leading-relaxed">
-                    Write your HTML, CSS, and JavaScript code. Click the tabs below to switch between languages.
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-between mb-8">{/* Added bottom margin for more spacing */}{/* ...existing button content... */}
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3">
                     {lastSaved && (
-                      <div className="bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm flex items-center space-x-2 border border-green-200">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
+                      <div className="text-green-600 text-sm">
+                        Saved: {lastSaved.toLocaleTimeString()}
                       </div>
                     )}
-                  </div>                    <div className="flex items-center space-x-4">
                     <button
-                      onClick={clearAllCode}
-                      type="button"
-                      className="px-5 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-3 bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl hover:transform hover:scale-105"
-                      title="Clear All Code"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                      <span>Clear All</span>
-                    </button>
-                    <button
-                      onClick={handlePaletteClick}
-                      type="button"
-                      className="px-5 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-3 bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl hover:transform hover:scale-105"
-                      title="Color Palette"
-                    >
-                      <Palette className="w-5 h-5" />
-                      <span>Colors</span>
-                    </button>
-                    <button
-                      onClick={formatCode}
-                      type="button"
-                      className="px-5 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl hover:transform hover:scale-105"
-                      title="Format Code"
-                    >
-                      <Code2 className="w-5 h-5" />
-                      <span>Format</span>
-                    </button>                    <button
                       onClick={handleManualSave}
                       disabled={isPreviewUpdating}
                       type="button"
-                      className={`px-8 py-4 rounded-2xl font-black text-xl transition-all duration-200 flex items-center space-x-4 shadow-2xl hover:shadow-3xl transform hover:scale-110 border-4 ${
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                         isPreviewUpdating
-                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
-                          : 'bg-gradient-to-r from-vault-accent to-green-500 hover:from-green-400 hover:to-green-600 text-white border-vault-accent hover:border-green-400 ring-4 ring-vault-accent/30 hover:ring-green-400/40'
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-vault-accent text-white hover:bg-vault-accent-dark'
                       }`}
                     >
                       {isPreviewUpdating ? (
                         <>
-                          <RefreshCw className="w-7 h-7 animate-spin" />
-                          <span>UPDATING...</span>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Updating...</span>
                         </>
                       ) : (
                         <>
-                          <Save className="w-7 h-7" />
-                          <span>💾 SAVE & PREVIEW</span>
+                          <Save className="w-4 h-4" />
+                          <span>Update Preview</span>
                         </>
                       )}
                     </button>
                   </div>
                 </div>
-              </div>              {/* Editor Tabs - Made Much More Prominent */}
-              <div className="bg-gradient-to-r from-slate-100 to-slate-200 border-b-2 border-gray-300 py-4">
-                <div className="flex justify-center space-x-8 px-12">
-                  {editorTabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('🔥 TAB CLICKED:', tab.id);
-                        setActiveTab(tab.id as 'html' | 'css' | 'js');
-                        window.showToast?.(`Switched to ${tab.label} editor`, 'info');
-                      }}
-                      className={`px-16 py-6 text-3xl font-black transition-all duration-300 border-4 cursor-pointer relative rounded-2xl min-w-[180px] transform hover:scale-105 shadow-xl ${
-                        activeTab === tab.id
-                          ? 'text-white bg-gradient-to-r from-vault-accent to-green-500 border-vault-accent shadow-2xl scale-110 ring-4 ring-vault-accent/30'
-                          : 'text-gray-700 bg-white border-gray-300 hover:text-vault-accent hover:border-vault-accent hover:shadow-2xl hover:bg-vault-accent/5'
-                      }`}
-                    >
-                      <div className="flex flex-col items-center space-y-2">
-                        <span className="text-4xl">
-                          {tab.id === 'html' ? '🌐' : tab.id === 'css' ? '🎨' : '⚡'}
-                        </span>
-                        <span className="font-black tracking-wider">{tab.label}</span>
-                      </div>                      {activeTab === tab.id && (
-                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full border-4 border-white shadow-lg">
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
+              </div>              {/* Compact Editor Tabs */}
+              <div className="bg-gray-100 flex border-b">
+                {editorTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setActiveTab(tab.id as 'html' | 'css' | 'js');
+                    }}
+                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-white text-vault-accent border-b-2 border-vault-accent'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
               
-              {/* Editor Settings */}
-              <div className="bg-slate-50 px-12 py-10 border-b border-gray-200">{/* Increased padding */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-16">{/* Increased spacing between controls */}                    <div className="flex items-center space-x-6">{/* Increased spacing within each control */}
-                      <label className="text-lg font-bold text-gray-700">Font Size:</label>
-                      <select 
-                        value={editorFontSize} 
-                        onChange={(e) => setEditorFontSize(Number(e.target.value))}
-                        className="bg-white border-2 border-gray-300 rounded-xl px-5 py-3 text-lg text-gray-700 focus:border-vault-accent focus:ring-2 focus:ring-vault-accent/20 shadow-md"
-                      >
-                        <option className="text-gray-800" value={12}>12px</option>
-                        <option className="text-gray-800" value={14}>14px</option>
-                        <option className="text-gray-800" value={16}>16px</option>
-                        <option className="text-gray-800" value={18}>18px</option>
-                        <option className="text-gray-800" value={20}>20px</option>
-                      </select>
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                      <label className="text-lg font-bold text-gray-700">Word Wrap:</label>
-                      <button
-                        onClick={() => setEditorWordWrap(editorWordWrap === 'on' ? 'off' : 'on')}                        className={`px-6 py-3 rounded-xl text-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg ${
-                          editorWordWrap === 'on' 
-                            ? 'bg-vault-accent text-white border-2 border-vault-accent transform scale-105' 
-                            : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:transform hover:scale-102'
-                        }`}
-                      >
-                        {editorWordWrap === 'on' ? 'On' : 'Off'}
-                      </button>
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                      <label className="text-lg font-bold text-gray-700">Line Numbers:</label>
-                      <button
-                        onClick={() => setEditorLineNumbers(editorLineNumbers === 'on' ? 'off' : 'on')}
-                        className={`px-6 py-3 rounded-xl text-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg ${
-                          editorLineNumbers === 'on' 
-                            ? 'bg-vault-accent text-white border-2 border-vault-accent transform scale-105' 
-                            : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:transform hover:scale-102'
-                        }`}
-                      >
-                        {editorLineNumbers === 'on' ? 'On' : 'Off'}
-                      </button>
-                    </div>
-                  </div>                    <div className="text-lg text-gray-600 bg-gradient-to-r from-blue-50 to-green-50 px-8 py-6 rounded-2xl border-2 border-blue-200 shadow-lg">
-                    <div className="space-y-3">
-                      <div className="text-xl font-bold text-blue-800 mb-3">⌨️ Keyboard Shortcuts:</div>
-                      <div className="flex items-center space-x-3">
-                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-blue-300 shadow-md font-bold">Ctrl+S</kbd>
-                        <span className="font-semibold">Update Preview</span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-green-300 shadow-md font-bold">Ctrl+Enter</kbd>
-                        <span className="font-semibold">Quick Update</span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-purple-300 shadow-md font-bold">F5</kbd>
-                        <span className="font-semibold">Refresh Preview</span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border-2 border-orange-300 shadow-md font-bold">Ctrl+Shift+F</kbd>
-                        <span className="font-semibold">Format Code</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>              {/* Monaco Editor Container */}
-              <div className="h-[600px] relative bg-[#1e1e1e]">
-                <div className="absolute top-6 left-6 z-10">
-                  <span className="bg-vault-accent text-white px-6 py-3 rounded-xl text-base font-bold shadow-lg">
-                    Currently editing: {activeTab.toUpperCase()}
-                  </span>
-                </div>
-                
-                {/* Floating Quick Update Button */}
-                <div className="absolute top-6 right-6 z-10">
+              {/* Compact Editor Controls */}
+              <div className="bg-gray-50 px-4 py-2 border-b flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-4">
                   <button
-                    onClick={handleManualSave}
-                    disabled={isPreviewUpdating}
+                    onClick={clearAllCode}
                     type="button"
-                    className={`px-6 py-3 rounded-xl font-bold text-lg transition-all duration-200 flex items-center space-x-3 shadow-2xl hover:shadow-3xl transform hover:scale-110 border-3 ${
-                      isPreviewUpdating
-                        ? 'bg-gray-600 text-gray-300 cursor-not-allowed border-gray-500'
-                        : 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white border-green-400 ring-2 ring-white/50'
-                    }`}
-                    title="Quick Update Preview (Ctrl+S, Ctrl+Enter, or F5)"
+                    className="text-red-600 hover:text-red-700 flex items-center space-x-1"
                   >
-                    {isPreviewUpdating ? (
-                      <>
-                        <RefreshCw className="w-5 h-5 animate-spin" />
-                        <span>Updating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-5 h-5" />
-                        <span>⚡ Quick Update</span>
-                      </>
-                    )}
+                    <Trash2 className="w-3 h-3" />
+                    <span>Clear</span>
                   </button>
-                </div><Editor
+                  <button
+                    onClick={handlePaletteClick}
+                    type="button"
+                    className="text-purple-600 hover:text-purple-700 flex items-center space-x-1"
+                  >
+                    <Palette className="w-3 h-3" />
+                    <span>Colors</span>
+                  </button>
+                  <button
+                    onClick={formatCode}
+                    type="button"
+                    className="text-blue-600 hover:text-blue-700 flex items-center space-x-1"
+                  >
+                    <Code2 className="w-3 h-3" />
+                    <span>Format</span>
+                  </button>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span>Font: {editorFontSize}px</span>
+                  <button
+                    onClick={() => setEditorFontSize(prev => prev < 20 ? prev + 2 : 12)}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    A+
+                  </button>
+                  <span>Ctrl+S to update</span>
+                </div>
+              </div>              {/* Monaco Editor Container - CLEAN NO OVERLAPS */}
+              <div className="h-[600px] bg-[#1e1e1e]">
+                <Editor
                   height="100%"
                   language={editorTabs.find(tab => tab.id === activeTab)?.language}
                   value={
@@ -842,7 +796,7 @@ const UploadPage = () => {
                     activeTab === 'css' ? snippetData.cssCode :
                     snippetData.jsCode
                   }
-                  onChange={(value) => handleCodeChange(value, editorTabs.find(tab => tab.id === activeTab)?.language || 'css')}                  onMount={(editor, monaco) => {
+                  onChange={(value) => handleCodeChange(value, editorTabs.find(tab => tab.id === activeTab)?.language || 'css')}onMount={(editor, monaco) => {
                     // Store editor reference for color picker
                     editorRef.current = editor;
                       // Enhanced Ctrl+S keyboard shortcut with proper event handling
