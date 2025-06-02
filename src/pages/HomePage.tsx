@@ -234,9 +234,8 @@ const HomePage = () => {
   ];
 
   return (
-    <>
-      {/* Hero Section with 3D Background - Full Width */}
-      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden mb-40 -mx-4 -mt-8">
+    <>      {/* Hero Section with 3D Background - Full Width */}
+      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden mb-40">
         <ThreeHero />
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-6 py-24">

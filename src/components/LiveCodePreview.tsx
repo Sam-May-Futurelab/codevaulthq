@@ -100,16 +100,14 @@ const LiveCodePreview: React.FC<LiveCodePreviewProps> = ({
     } else if (iframeRef.current) {
       iframeRef.current.requestFullscreen?.();
     }
-  };
-
-  return (
-    <div className="bg-vault-medium rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-white font-semibold flex items-center gap-2">
-          <Play className="w-5 h-5 text-vault-accent" />
+  };  return (
+    <div className="bg-vault-medium rounded-lg p-6 w-full max-w-full overflow-hidden">
+      <div className="flex items-center justify-between mb-4 overflow-hidden">
+        <h2 className="text-white font-semibold flex items-center gap-2 truncate">
+          <Play className="w-5 h-5 text-vault-accent shrink-0" />
           {title}
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={handleRefresh}
             disabled={isLoading}
@@ -152,14 +150,13 @@ const LiveCodePreview: React.FC<LiveCodePreviewProps> = ({
                   <span>Loading preview...</span>
                 </div>
               </div>
-            )}
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+            )}            <div className="w-full flex items-center justify-center" style={{ minHeight: '300px' }}>
               <iframe
                 ref={iframeRef}
-                className="w-full h-64 border-0 bg-transparent"
+                className="w-full h-64 border-0 bg-transparent max-w-full"
                 title="Code Preview"
                 sandbox="allow-scripts allow-same-origin"
-                style={{ minHeight: '300px', transform: 'scale(1.25)', transformOrigin: 'center' }}
+                style={{ minHeight: '300px', transform: 'scale(1)', transformOrigin: 'center' }}
               />
             </div>
           </>
