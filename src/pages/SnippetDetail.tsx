@@ -142,7 +142,7 @@ const SnippetDetail = () => {
   const codeObj = getCodeObject();
   const stats = getStats();  return (
     <div className="min-h-screen bg-vault-dark overflow-x-hidden">
-      {/* Container with very strict width constraints */}
+      {/* Container with centered content and proper spacing */}
       <div style={{ maxWidth: '768px', margin: '0 auto', padding: '2rem 1rem', overflow: 'hidden' }}>
         {/* Back Navigation */}
         <Link to="/browse" className="inline-flex items-center space-x-2 text-gray-400 hover:text-white mb-8 transition-colors">
@@ -150,19 +150,17 @@ const SnippetDetail = () => {
           <span>Back to Browse</span>
         </Link>
 
-        {/* Header */}
-        <div className="mb-8" style={{ overflow: 'hidden' }}>
+        {/* Header - Centered */}
+        <div className="mb-8 text-center" style={{ overflow: 'hidden' }}>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ wordBreak: 'break-word' }}>{snippet.title}</h1>
           <p className="text-lg text-gray-300" style={{ wordBreak: 'break-word' }}>{snippet.description}</p>
-        </div>
-
-        {/* Main Content - Single Column Layout with Very Strict Constraints */}
+        </div>        {/* Main Content - Single Column Layout with Centered Elements */}
         <div className="space-y-8" style={{ overflow: 'hidden' }}>
           
-          {/* Live Preview */}
+          {/* Live Preview - Auto-fitting height */}
           <div className="bg-vault-medium/50 border border-vault-light/20 rounded-xl p-6" style={{ overflow: 'hidden', maxWidth: '100%' }}>
-            <h2 className="text-xl font-semibold text-white mb-4">Live Preview</h2>
-            <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
+            <h2 className="text-xl font-semibold text-white mb-4 text-center">Live Preview</h2>
+            <div style={{ overflow: 'hidden', maxWidth: '100%', borderRadius: '8px' }}>
               <LiveCodePreview
                 html={codeObj.html}
                 css={codeObj.css}

@@ -19,7 +19,6 @@ const LiveCodePreview: React.FC<LiveCodePreviewProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const generatePreviewCode = () => {
     return `
 <!DOCTYPE html>
@@ -29,28 +28,52 @@ const LiveCodePreview: React.FC<LiveCodePreviewProps> = ({
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Preview</title>
     <style>
-        body {
+        html, body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #1a1a1a;
             color: #ffffff;
-            overflow-x: hidden;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 10px;
         }
         * {
             box-sizing: border-box;
+        }
+        /* Auto-fitting container for better content display */
+        .preview-container {
+            max-width: 100%;
+            max-height: 100%;
+            transform-origin: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Gentle scaling for large elements to fit in preview */
+        .card-container, .flip-card {
+            transform: scale(0.8);
+            transform-origin: center;
         }
         ${css}
     </style>
 </head>
 <body>
-    ${html}
+    <div class="preview-container">
+        ${html}
+    </div>
     <script>
         try {
             ${javascript}
         } catch (error) {
             console.error('Preview Error:', error);
-            document.body.innerHTML = '<div style="color: #ff6b6b; padding: 20px; text-align: center;">Error executing JavaScript: ' + error.message + '</div>';
         }
     </script>
 </body>

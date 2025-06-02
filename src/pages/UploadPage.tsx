@@ -248,8 +248,8 @@ const UploadPage = () => {
     setLastSaved(new Date());
     setTimeout(() => setIsPreviewUpdating(false), 300);
     
-    // Show a success toast
-    window.showToast?.('Preview updated', 'success');
+    // Show a success toast with keyboard shortcut acknowledgment
+    window.showToast?.('💾 Preview updated successfully!', 'success');
   };
   // Handle submission of the snippet
   const handleSubmit = async () => {
@@ -260,8 +260,7 @@ const UploadPage = () => {
         window.showToast?.('Please sign in to upload snippets', 'error');
         return;
       }
-      
-      // Validate required fields
+        // Validate required fields
       if (!snippetData.title.trim()) {
         window.showToast?.('Please enter a title for your snippet', 'error');
         return;
@@ -270,7 +269,12 @@ const UploadPage = () => {
       if (!snippetData.description.trim()) {
         window.showToast?.('Please enter a description for your snippet', 'error');
         return;
-      }      // Prepare snippet data for Firebase
+      }
+      
+      if (snippetData.description.length > 120) {
+        window.showToast?.('Description cannot exceed 120 characters', 'error');
+        return;
+      }// Prepare snippet data for Firebase
       // Find the complete category information
       let categoryInfo = { 
         id: snippetData.category, 
@@ -392,19 +396,42 @@ const UploadPage = () => {
                     className="w-full bg-white border-2 border-gray-300 rounded-xl px-6 py-4 text-gray-800 placeholder-gray-500 focus:border-vault-accent focus:outline-none transition-all duration-200 text-lg"
                     placeholder="Enter snippet title"
                   />
-                </div>
-
-                <div>
+                </div>                <div>
                   <label className="block text-base font-semibold text-gray-700 mb-4">
                     Description
+                    <span className="text-sm text-gray-500 ml-2">
+                      ({snippetData.description.length}/120 characters)
+                    </span>
                   </label>
                   <textarea
-                    value={snippetData.description}                    onChange={(e) => setSnippetData(prev => ({ ...prev, description: e.target.value }))}
+                    value={snippetData.description}
+                    onChange={(e) => {
+                      const newValue = e.target.value;                      if (newValue.length <= 120) {
+                        setSnippetData(prev => ({ ...prev, description: newValue }));
+                      } else {
+                        window.showToast?.('Description cannot exceed 120 characters', 'error');
+                      }
+                    }}
                     rows={4}
-                    className="w-full bg-white border-2 border-gray-300 rounded-xl px-6 py-4 text-gray-800 placeholder-gray-500 focus:border-vault-accent focus:outline-none transition-all duration-200 resize-none text-lg"
-                    placeholder="Describe your snippet and its functionality"
+                    className={`w-full bg-white border-2 rounded-xl px-6 py-4 text-gray-800 placeholder-gray-500 focus:outline-none transition-all duration-200 resize-none text-lg ${
+                      snippetData.description.length > 100 
+                        ? 'border-orange-400 focus:border-orange-500' 
+                        : 'border-gray-300 focus:border-vault-accent'
+                    }`}
+                    placeholder="Describe your snippet and its functionality (max 120 characters)"
                   />
-                </div>                <div>
+                  {snippetData.description.length > 100 && (
+                    <div className={`mt-2 text-sm font-medium ${
+                      snippetData.description.length >= 120 
+                        ? 'text-red-600' 
+                        : 'text-orange-600'
+                    }`}>
+                      {snippetData.description.length >= 120 
+                        ? '⚠️ Maximum character limit reached' 
+                        : `📝 ${120 - snippetData.description.length} characters remaining`}
+                    </div>
+                  )}
+                </div><div>
                   <label className="block text-base font-semibold text-gray-700 mb-4">
                     Category
                   </label>
@@ -627,9 +654,11 @@ const UploadPage = () => {
                       </button>
                     </div>
                   </div>
-                  
-                  <div className="text-lg text-gray-600 bg-gray-100 px-6 py-4 rounded-xl border border-gray-200 shadow-md">
-                    Press <kbd className="bg-white px-4 py-2 rounded-lg text-base font-mono border border-gray-300 shadow-sm">Ctrl+S</kbd> to save
+                    <div className="text-lg text-gray-600 bg-gray-100 px-6 py-4 rounded-xl border border-gray-200 shadow-md">
+                    <div className="space-y-2">
+                      <div>Press <kbd className="bg-white px-3 py-1 rounded-md text-sm font-mono border border-gray-300 shadow-sm">Ctrl+S</kbd> to save</div>
+                      <div>Press <kbd className="bg-white px-3 py-1 rounded-md text-sm font-mono border border-gray-300 shadow-sm">Ctrl+Shift+F</kbd> to format</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -654,8 +683,15 @@ const UploadPage = () => {
                     
                     // Add Ctrl+S keyboard shortcut
                     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+                      console.log('🎯 Ctrl+S pressed in Monaco Editor');
                       handleManualSave();
-                      return true; // Event handled
+                      return true; // Event handled, prevent browser default
+                    });
+                    
+                    // Add additional shortcuts for enhanced user experience
+                    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => {
+                      formatCode();
+                      return true;
                     });
                   }}theme="vs-dark"
                   options={{
@@ -711,8 +747,7 @@ const UploadPage = () => {
                   </button>
                 </div>
               </div>
-              
-              <div className="space-y-4 bg-slate-50 p-6 rounded-xl border border-gray-200">
+                <div className="space-y-4 bg-slate-50 p-6 rounded-xl border border-gray-200">
                 <div className="flex items-center space-x-3 text-green-700">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   <p className="text-base font-semibold">
@@ -722,7 +757,7 @@ const UploadPage = () => {
                 <div className="flex items-center space-x-3 text-blue-700">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                   <p className="text-base font-semibold">
-                    <strong>Keyboard shortcut:</strong> Press <kbd className="bg-white px-3 py-2 rounded-lg text-sm border border-gray-300 font-mono shadow-sm">Ctrl+S</kbd> in the editor to save immediately
+                    <strong>Keyboard shortcuts:</strong> Press <kbd className="bg-white px-3 py-2 rounded-lg text-sm border border-gray-300 font-mono shadow-sm">Ctrl+S</kbd> to save immediately, <kbd className="bg-white px-3 py-2 rounded-lg text-sm border border-gray-300 font-mono shadow-sm">Ctrl+Shift+F</kbd> to format code
                   </p>
                 </div>
                 <div className="flex items-center space-x-3 text-purple-700">
