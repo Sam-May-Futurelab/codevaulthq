@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -39,10 +38,10 @@ const UploadPage = () => {
   const [colorPickerPosition, setColorPickerPosition] = useState({ x: 0, y: 0 });
   const [editorFontSize, setEditorFontSize] = useState(16);
   const [editorWordWrap, setEditorWordWrap] = useState<'on' | 'off'>('on');
-  const [editorLineNumbers, setEditorLineNumbers] = useState<'on' | 'off'>('on');
-  const previewRef = useRef<HTMLIFrameElement>(null);
+  const [editorLineNumbers, setEditorLineNumbers] = useState<'on' | 'off'>('on');  const previewRef = useRef<HTMLIFrameElement>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const editorRef = useRef<any>(null);// Auto-update preview with debouncing
+  const editorRef = useRef<any>(null);
+  const currentBlobUrlRef = useRef<string | null>(null);// Auto-update preview with debouncing
   const debouncedUpdatePreview = useCallback(() => {
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
@@ -119,7 +118,24 @@ const UploadPage = () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [showCategoryDropdown]);// Hierarchical category structure
+  }, [showCategoryDropdown]);
+
+  // Cleanup effect for blob URLs and timeouts
+  useEffect(() => {
+    return () => {
+      // Clean up any pending timeouts
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+      // Clean up any blob URLs
+      if (currentBlobUrlRef.current) {
+        URL.revokeObjectURL(currentBlobUrlRef.current);
+        currentBlobUrlRef.current = null;
+      }
+    };
+  }, []);
+
+// Hierarchical category structure
   const categoryStructure = {
     essentials: {
       name: 'Essential Components',
@@ -299,6 +315,12 @@ const UploadPage = () => {
     console.log('Generating preview with active tab:', activeTab);
     
     try {
+      // Clean up any existing blob URL
+      if (currentBlobUrlRef.current) {
+        URL.revokeObjectURL(currentBlobUrlRef.current);
+        currentBlobUrlRef.current = null;
+      }
+
       // Create the HTML for the preview
       const previewHtml = `
         <!DOCTYPE html>
@@ -315,17 +337,17 @@ const UploadPage = () => {
               color: white;
               font-family: Arial, sans-serif;
             }
-            ${snippetData.cssCode}
+            ${snippetData.cssCode || '/* No CSS code */'}
           </style>
         </head>
         <body>
-          ${snippetData.htmlCode}
+          ${snippetData.htmlCode || '<!-- No HTML code -->'}
           <script>
             // Wrapped in try-catch to prevent errors from breaking the preview
             try {
-              ${snippetData.jsCode}
+              ${snippetData.jsCode || '// No JavaScript code'}
             } catch (error) {
-              console.error('JavaScript error:', error);
+              console.error('JavaScript error in preview:', error);
             }
           </script>
         </body>
@@ -333,22 +355,31 @@ const UploadPage = () => {
       `;
 
       if (previewRef.current) {
-        // Create a blob from the HTML
-        const blob = new Blob([previewHtml], { type: 'text/html' });
+        // Use srcdoc instead of blob URLs to avoid security issues
+        previewRef.current.srcdoc = previewHtml;
         
-        // Create a new URL
-        const url = URL.createObjectURL(blob);
-        
-        // Set the source of the iframe
-        previewRef.current.src = url;
+        // Clear any existing src to prevent conflicts
+        previewRef.current.src = '';
         
         // Log successful update
-        console.log('Preview updated with new content');
+        console.log('Preview updated with new content using srcdoc');
       } else {
         console.error('Preview iframe reference not found');
       }
     } catch (error) {
       console.error('Error generating preview:', error);
+      // Fallback: try to show error message in preview
+      if (previewRef.current) {
+        previewRef.current.srcdoc = `
+          <html>
+            <body style="background: #0a0a0a; color: white; padding: 20px; font-family: Arial, sans-serif;">
+              <h3>⚠️ Preview Error</h3>
+              <p>There was an error generating the preview.</p>
+              <p>Error: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+            </body>
+          </html>
+        `;
+      }
     }
   };// Manual save function (for the Update Now button)
   const handleManualSave = () => {
@@ -576,22 +607,21 @@ const UploadPage = () => {
                               for (const [mainKey, mainCategory] of Object.entries(categoryStructure)) {
                                 const subcat = mainCategory.subcategories.find(sub => sub.id === snippetData.category);
                                 if (subcat) {
-                                  return (
-                                    <React.Fragment key={subcat.id}>
-                                      <div 
-                                        className="w-4 h-4 rounded-full shadow-sm"
-                                        style={{
-                                          background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
-                                        }}
-                                      />
-                                      <span className="font-semibold text-gray-800">
-                                        {subcat.label}
-                                      </span>
-                                      <span className="text-sm text-gray-500">
-                                        in {mainCategory.name}
-                                      </span>
-                                    </React.Fragment>
-                                  );
+                                  return [
+                                    <div 
+                                      key="gradient"
+                                      className="w-4 h-4 rounded-full shadow-sm"
+                                      style={{
+                                        background: `linear-gradient(135deg, ${getGradientColors(mainKey)})`
+                                      }}
+                                    />,
+                                    <span key="label" className="font-semibold text-gray-800">
+                                      {subcat.label}
+                                    </span>,
+                                    <span key="category" className="text-sm text-gray-500">
+                                      in {mainCategory.name}
+                                    </span>
+                                  ];
                                 }
                               }
                               return null;
