@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Editor } from '@monaco-editor/react';
-import { Play, Eye, Save, Upload, Tag, Palette, Code2, FileImage, RefreshCw, Layout, Settings, Sparkles } from 'lucide-react';
+import { Play, Eye, Save, Upload, Tag, Palette, Code2, RefreshCw, Layout, Settings, Sparkles } from 'lucide-react';
 import FirebaseDbService from '../services/FirebaseDbService';
 import { useAuth } from '../hooks/useAuth.tsx';
 import AuthModal from '../components/AuthModal';
@@ -37,6 +37,7 @@ const UploadPage = () => {
   const [editorFontSize, setEditorFontSize] = useState(16);
   const [editorWordWrap, setEditorWordWrap] = useState<'on' | 'off'>('on');
   const [editorLineNumbers, setEditorLineNumbers] = useState<'on' | 'off'>('on');
+  const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>('visual'); // Default to visual since animations is selected
   const previewRef = useRef<HTMLIFrameElement>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const editorRef = useRef<any>(null);// Auto-update preview with debouncing
@@ -130,15 +131,6 @@ const UploadPage = () => {
     }
   };
 
-  // Legacy categories for backward compatibility
-  const categories = [
-    { id: 'ui-components', label: 'UI Components', icon: Code2, color: 'text-blue-400' },
-    { id: 'animations', label: 'Animations', icon: Play, color: 'text-purple-400' },
-    { id: 'layouts', label: 'Layouts', icon: FileImage, color: 'text-green-400' },
-    { id: 'effects', label: 'Visual Effects', icon: Palette, color: 'text-pink-400' },
-    { id: 'games', label: 'Games & Interactive', icon: Code2, color: 'text-orange-400' },
-    { id: 'utilities', label: 'Tools & Utilities', icon: Code2, color: 'text-gray-400' }
-  ];
 
   const editorTabs = [
     { id: 'html', label: 'HTML', language: 'html' },
@@ -285,12 +277,11 @@ const UploadPage = () => {
       
       console.log('✅ Snippet uploaded successfully! ID:', snippetId);
       window.showToast?.(`🎉 Snippet uploaded successfully! ID: ${snippetId}`, 'success');
-      
-      // Reset form
+        // Reset form
       setSnippetData({
         title: '',
         description: '',
-        category: 'css',
+        category: 'animations',
         tags: [],
         htmlCode: '<!-- Your HTML code here -->\n<div class="container">\n  <h1>Hello World</h1>\n</div>',
         cssCode: '/* Your CSS code here */\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  font-family: Arial, sans-serif;\n}\n\nh1 {\n  color: #333;\n  font-size: 2rem;\n}',
@@ -373,29 +364,98 @@ const UploadPage = () => {
                   <label className="block text-base font-semibold text-gray-700 mb-4">
                     Category
                   </label>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {categories.map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setSnippetData(prev => ({ ...prev, category: category.id }));
-                          window.showToast?.(`Category selected: ${category.label}`, 'info');
-                        }}
-                        type="button"
-                        className={`p-3 rounded-xl border-2 transition-all duration-300 cursor-pointer min-h-[60px] flex flex-col items-center justify-center ${
-                          snippetData.category === category.id
-                            ? 'border-vault-accent bg-vault-accent/15 text-vault-accent shadow-lg transform scale-105'
-                            : 'border-gray-300 bg-white hover:border-vault-accent/60 text-gray-700 hover:shadow-md hover:transform hover:scale-102 hover:bg-gray-50'
-                        }`}
+                  
+                  {/* Main Categories */}
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-3">
+                      {Object.entries(categoryStructure).map(([key, mainCategory]) => (
+                        <button
+                          key={key}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSelectedMainCategory(selectedMainCategory === key ? null : key);
+                          }}
+                          type="button"
+                          className={`p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer min-h-[80px] flex flex-col items-center justify-center ${
+                            selectedMainCategory === key
+                              ? 'border-vault-accent bg-vault-accent/15 text-vault-accent shadow-lg transform scale-105'
+                              : 'border-gray-300 bg-white hover:border-vault-accent/60 text-gray-700 hover:shadow-md hover:transform hover:scale-102 hover:bg-gray-50'
+                          }`}
+                        >
+                          <mainCategory.icon className={`w-6 h-6 mb-2 ${
+                            selectedMainCategory === key ? 'text-vault-accent' : mainCategory.color
+                          }`} />
+                          <div className="text-sm font-semibold text-center">{mainCategory.name}</div>
+                        </button>
+                      ))}
+                    </div>
+                      {/* Subcategories */}
+                    {selectedMainCategory && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-gray-50 rounded-xl p-6 border border-gray-200"
                       >
-                        <category.icon className={`w-5 h-5 mb-1 ${
-                          snippetData.category === category.id ? 'text-vault-accent' : 'text-gray-600'
-                        }`} />
-                        <div className="text-sm font-semibold">{category.label}</div>
-                      </button>
-                    ))}
+                        {(() => {
+                          const mainCategory = categoryStructure[selectedMainCategory as keyof typeof categoryStructure];
+                          const IconComponent = mainCategory.icon;
+                          return (
+                            <>
+                              <div className="flex items-center space-x-3 mb-4">
+                                <IconComponent className={`w-5 h-5 ${mainCategory.color}`} />
+                                <h4 className="text-lg font-bold text-gray-800">
+                                  {mainCategory.name}
+                                </h4>
+                              </div>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {mainCategory.subcategories.map((subcat) => (
+                                  <button
+                                    key={subcat.id}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setSnippetData(prev => ({ ...prev, category: subcat.id }));
+                                      window.showToast?.(`Category selected: ${subcat.label}`, 'info');
+                                    }}
+                                    type="button"
+                                    className={`p-3 rounded-lg border transition-all duration-300 cursor-pointer flex items-center space-x-2 ${
+                                      snippetData.category === subcat.id
+                                        ? 'border-vault-accent bg-vault-accent/15 text-vault-accent shadow-lg transform scale-105'
+                                        : 'border-gray-200 bg-white hover:border-vault-accent/40 text-gray-700 hover:shadow-md hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    <div className={`w-2 h-2 rounded-full ${mainCategory.color.replace('text-', 'bg-')}`}></div>
+                                    <div className="text-sm font-medium">{subcat.label}</div>
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </motion.div>
+                    )}
+                    
+                    {/* Selected Category Display */}
+                    {snippetData.category && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>                          <span className="text-blue-800 font-semibold">                            Selected: {(() => {
+                              // Find the selected category label
+                              for (const [_key, mainCategory] of Object.entries(categoryStructure)) {
+                                const subcat = mainCategory.subcategories.find(sub => sub.id === snippetData.category);
+                                if (subcat) {
+                                  return `${mainCategory.name} > ${subcat.label}`;
+                                }
+                              }
+                              return snippetData.category;
+                            })()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div><div>
                   <label className="block text-xl font-bold text-gray-700 mb-8">
