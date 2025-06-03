@@ -1,10 +1,11 @@
 import { Heart, Eye, User, CheckCircle, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import LiveCodePreviewSimple from './LiveCodePreviewSimple';
 import AudioFeedback from '../utils/AudioFeedback';
 import { useSnippetInteraction } from '../hooks/useFirebaseData';
+import { useEnhancedLikeSystem } from '../hooks/useEnhancedLikeSystem';
+import { useEnhancedViewTracking } from '../hooks/useEnhancedViewTracking';
 import type { SnippetData } from '../data/snippets';
 import type { SnippetWithAnalytics } from '../services/SnippetApiService';
 import type { SnippetWithMetrics } from '../types';
@@ -18,14 +19,7 @@ interface SnippetCardProps {
 
 const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting = false }: SnippetCardProps) => {
   const audio = AudioFeedback.getInstance();
-  const { trackInteraction } = useSnippetInteraction(snippet.id);
-  const [isLiked, setIsLiked] = useState(false);
   
-  // Helper function to get snippet properties with fallbacks
-  const getSnippetProperty = (prop: string): any => {
-    return (snippet as any)[prop];
-  };
-
   // Get current stats with proper fallbacks
   const getCurrentStats = () => {
     // Check if snippet has analytics property
@@ -55,35 +49,41 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
     };
   };
 
-  const [localStats, setLocalStats] = useState(getCurrentStats());
+  // Enhanced like system
+  const initialStats = getCurrentStats();
+  const { 
+    isLiked, 
+    likeCount, 
+    toggleLike, 
+    isAnimating,
+    canLike,
+    isAuthenticated 
+  } = useEnhancedLikeSystem(snippet.id, initialStats.likes, {
+    enableAnimations: true,
+    showNotifications: true,
+    persistState: true,
+    optimisticUpdates: true
+  });
 
-  // Track view when component mounts
-  useEffect(() => {
-    trackInteraction('view');
-  }, [snippet.id, trackInteraction]);
+  // Enhanced view tracking - Initialize tracking but don't need the values for display
+  useEnhancedViewTracking(snippet.id, {
+    minViewDuration: 1000,
+    trackUniqueViews: true,
+    trackEngagementTime: true,
+    trackScrollDepth: false
+  });
 
-  // Handle like interaction
-  const handleLike = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    audio.playClick();
-    
-    try {
-      await trackInteraction('like');
-      setIsLiked(!isLiked);
-      setLocalStats(prev => ({
-        ...prev,
-        likes: isLiked ? prev.likes - 1 : prev.likes + 1
-      }));
-    } catch (error) {
-      console.warn('Failed to track like:', error);
-    }
+  // Helper function to get snippet properties with fallbacks
+  const getSnippetProperty = (prop: string): any => {
+    return (snippet as any)[prop];
   };
 
   // Handle download tracking when viewing code
+  const { trackInteraction } = useSnippetInteraction(snippet.id);
   const handleViewCode = async () => {
     try {
       await trackInteraction('download');
+      audio.playClick();
     } catch (error) {
       console.warn('Failed to track download:', error);
     }
@@ -168,7 +168,11 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
   const codeObj = getCodeObject();
   const author = getAuthorInfo();
   const category = getCategory();
-  const currentStats = localStats;
+  const currentStats = { 
+    ...initialStats, 
+    likes: likeCount, // Use enhanced like system count
+    views: initialStats.views 
+  };
   const thumbnailUrl = getThumbnailUrl();
 
   const categoryColors = {
@@ -277,12 +281,19 @@ const SnippetCard = ({ snippet, showDeleteButton = false, onDelete, isDeleting =
         {/* Like Button */}
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
-            onClick={handleLike}
-            className={`bg-vault-dark/80 hover:bg-vault-dark text-white p-2 rounded-lg backdrop-blur-sm transition-colors ${
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              audio.playClick();
+              toggleLike(e);
+            }}
+            disabled={!canLike}
+            className={`bg-vault-dark/80 hover:bg-vault-dark text-white p-2 rounded-lg backdrop-blur-sm transition-colors disabled:opacity-50 ${
               isLiked ? 'text-red-400' : ''
-            }`}
+            } ${isAnimating ? 'scale-110' : ''}`}
+            title={isAuthenticated ? (isLiked ? 'Unlike' : 'Like') : 'Login to like'}
           >
-            <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+            <Heart className={`w-4 h-4 transition-all duration-200 ${isLiked ? 'fill-current scale-110' : ''}`} />
           </button>
         </div>
       </div>      {/* CONTENT SECTION - Exactly 220px remaining height (480px - 260px) */}

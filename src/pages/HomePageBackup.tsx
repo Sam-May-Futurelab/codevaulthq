@@ -64,8 +64,7 @@ const HomePage = () => {
         { id: 'api', label: 'API Integration' },
         { id: 'auth', label: 'Authentication' }
       ]
-    },
-    advanced: {
+    },    advanced: {
       name: 'Advanced & Experimental',
       icon: Sparkles,
       color: 'text-purple-500',
@@ -76,8 +75,7 @@ const HomePage = () => {
         { id: 'performance', label: 'Performance' },
         { id: 'accessibility', label: 'Accessibility' }
       ]
-    },
-    utilities: {
+    },    utilities: {
       name: 'Tools & Utilities',
       icon: Wrench,
       color: 'text-gray-500',
@@ -117,8 +115,7 @@ const HomePage = () => {
       })
       .slice(0, limit);
   };
-
-  const getTopSnippets = (limit = 10) => {
+    const getTopSnippets = (limit = 10) => {
     return [...allSnippets]
       .sort((a, b) => {
         const aLikes = a.stats?.likes || a.metrics?.likes || a.analytics?.likes || 0;
@@ -149,10 +146,20 @@ const HomePage = () => {
       })
       .slice(0, limit);
   };
-
-  const displayTrendingSnippets = getTrendingSnippets(10);
+    const displayTrendingSnippets = getTrendingSnippets(10);
   const displayTopSnippets = getTopSnippets(10);
   
+  // Debug Firebase connection
+  console.log('Firebase Connection Debug:', {
+    firebaseSnippets: firebaseSnippets.length,
+    allSnippets: allSnippets.length,
+    loadingFirebase,
+    errorFirebase,
+    platformStats,
+    loadingStats,
+    errorStats
+  });
+
   const seedDatabase = async () => {
     if (isSeeding) return;
     
@@ -172,6 +179,20 @@ const HomePage = () => {
     // Initialize GSAP animations
     GSAPAnimations.initScrollAnimations();
     GSAPAnimations.initInteractiveAnimations();
+      // Animate counters for stats with real data once loaded
+    if (platformStats && !loadingStats) {
+      const statElements = document.querySelectorAll('.stat-value');
+      const values = [
+        platformStats.totalSnippets,
+        platformStats.totalUsers,
+        platformStats.totalDownloads,
+        platformStats.totalLikes
+      ];
+      
+      statElements.forEach((element, index) => {
+        GSAPAnimations.animateCounter(element as HTMLElement, values[index]);
+      });
+    }
 
     // Add magnetic effect to buttons
     const buttons = document.querySelectorAll('.magnetic-button');
@@ -190,39 +211,36 @@ const HomePage = () => {
 
     return () => {
       cleanupFunctions.forEach(cleanup => cleanup());
-    };
-  }, []);
+    };  }, [platformStats, loadingStats]);
 
   const stats = [
     { 
       icon: Code, 
       label: 'Snippets', 
-      value: allSnippets.length > 0 ? allSnippets.length.toLocaleString() : '12,547', 
+      value: loadingStats ? '12,547' : platformStats?.totalSnippets.toLocaleString() || '12,547', 
       subtitle: 'Interactive treasures' 
-    },
-    { 
+    },    { 
       icon: Users, 
       label: 'Creators', 
-      value: '3,892', 
+      value: loadingStats ? '3,892' : platformStats?.totalUsers.toLocaleString() || '3,892', 
       subtitle: 'Creative coders' 
     },
     { 
       icon: Download, 
       label: 'Downloads', 
-      value: '89,234', 
+      value: loadingStats ? '89,234' : platformStats?.totalDownloads.toLocaleString() || '89,234', 
       subtitle: 'Code shared globally' 
     },
     { 
       icon: Star, 
       label: 'Stars', 
-      value: '156,789', 
+      value: loadingStats ? '156,789' : platformStats?.totalLikes.toLocaleString() || '156,789', 
       subtitle: 'Developer favorites' 
     }
   ];
 
   return (
-    <>
-      {/* Hero Section with 3D Background - Full Width */}
+    <>      {/* Hero Section with 3D Background - Full Width */}
       <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden mb-40">
         <ThreeHero />
 
@@ -255,7 +273,7 @@ const HomePage = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-sm md:text-base text-vault-accent mb-16 font-code scan-line floating"
           >
-            {allSnippets.length > 0 ? allSnippets.length.toLocaleString() : '12,547'} snippets in the vault… and counting.
+            {loadingStats ? '12,547' : platformStats?.totalSnippets.toLocaleString() || '12,547'} snippets in the vault… and counting.
           </motion.p>
           
           <motion.div
@@ -342,9 +360,7 @@ const HomePage = () => {
               <p className="text-sm text-vault-accent font-code">
                 ✨ Curated by creative coders across the cosmos
               </p>
-            </motion.div>
-
-            {loadingFirebase ? (
+            </motion.div>            {loadingFirebase ? (
               <div className="text-center py-12">
                 <div className="text-vault-accent text-lg">Loading snippets...</div>
                 {import.meta.env.DEV && (
@@ -385,8 +401,7 @@ const HomePage = () => {
               >
                 View All Snippets
               </Link>
-            </motion.div>
-          </div>
+            </motion.div>          </div>
         </section>
 
         {/* Category Showcase Sections - Linear Layout */}
@@ -407,9 +422,7 @@ const HomePage = () => {
               <p className="text-sm text-vault-accent font-code">
                 🏆 Handpicked gems from our creative community
               </p>
-            </motion.div>
-
-            {/* Categories Linear Layout - Each category stacked vertically */}
+            </motion.div>            {/* Categories Linear Layout - Each category stacked vertically */}
             <div className="space-y-20">
               {Object.entries(categoryStructure).map(([categoryKey, category], categoryIndex) => {
                 const bestSnippets = getBestSnippetsFromCategory(categoryKey, 4);
@@ -439,9 +452,7 @@ const HomePage = () => {
                       <p className="text-gray-400 text-sm">
                         Top {bestSnippets.length} snippets from this category
                       </p>
-                    </div>
-
-                    {/* Snippets Grid - Use same responsive grid as trending snippets */}
+                    </div>                    {/* Snippets Grid - Use same responsive grid as trending snippets */}
                     <div className="snippet-grid mb-8">
                       {bestSnippets.map((snippet: any, index: number) => (
                         <motion.div
@@ -498,9 +509,7 @@ const HomePage = () => {
               <p className="text-sm text-vault-purple font-code">
                 🎯 Find exactly what you need with our curated categories
               </p>
-            </motion.div>
-
-            {/* Category Grid - Compact Layout */}
+            </motion.div>            {/* Category Grid - Compact Layout */}
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {Object.entries(categoryStructure).map(([key, category], index) => {
@@ -547,8 +556,7 @@ const HomePage = () => {
                         </div>
                       </div>
                     </motion.div>
-                  );
-                })}
+                  );                })}
               </div>
             </div>
           </div>
@@ -604,8 +612,7 @@ const HomePage = () => {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
                   className="trending-tag interactive-card bg-vault-medium/30 backdrop-blur-sm border border-vault-light/20 rounded-xl p-8 text-center hover:border-vault-accent/50 transition-all duration-300 cursor-pointer group"
-                >
-                  <div className="text-2xl font-bold text-white mb-2 font-mono">42</div>
+                >                  <div className="text-2xl font-bold text-white mb-2 font-mono">42</div>
                   <div className="text-sm text-gray-300 mb-3">{tag}</div>
                   <div className="text-xs text-vault-accent font-semibold">+12%</div>
                   <div className="mt-3 h-1 bg-vault-dark rounded-full overflow-hidden">
@@ -633,15 +640,14 @@ const HomePage = () => {
                 className="px-4 py-2 bg-vault-accent text-black rounded-lg font-bold hover:bg-vault-accent/80 transition-colors disabled:opacity-50"
               >
                 {isSeeding ? 'Seeding...' : 'Seed Firebase Data'}
-              </button>
-              <button
+              </button>              <button
                 onClick={() => {
                   console.log('Firebase Debug Info:', {
                     firebaseSnippets: firebaseSnippets.length,
                     allSnippets: allSnippets.length,
                     displayTrending: displayTrendingSnippets.length,
                     displayTop: displayTopSnippets.length,
-                    errors: { errorFirebase }
+                    errors: { errorFirebase, errorStats }
                   });
                 }}
                 className="px-4 py-2 bg-gray-600 text-white rounded-lg font-bold hover:bg-gray-500 transition-colors"
@@ -649,9 +655,9 @@ const HomePage = () => {
                 Debug Firebase
               </button>
             </div>
-            {errorFirebase && (
+            {(errorFirebase || errorStats) && (
               <div className="mt-3 text-red-400 text-xs">
-                <p>Errors: {errorFirebase}</p>
+                <p>Errors: {errorFirebase || errorStats}</p>
               </div>
             )}
           </div>

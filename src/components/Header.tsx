@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Search, Upload, Menu, Shield, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import UserProfileDropdown from './UserProfileDropdown';
+import NotificationCenter from './NotificationCenter';
 import AuthModal from './AuthModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -79,6 +80,7 @@ const Header = () => {
                 <Upload className="w-4 h-4" />
                 <span>Upload</span>
               </Link>
+              <NotificationCenter />
               <UserProfileDropdown onSignInClick={handleSignInClick} />
             </nav>
 
